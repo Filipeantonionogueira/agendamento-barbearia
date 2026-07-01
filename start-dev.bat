@@ -1,5 +1,13 @@
 @echo off
 cd /d "%~dp0"
+if not exist "backend\.env" (
+  echo Criando backend\.env...
+  copy "backend\.env.example" "backend\.env" > nul
+)
+if not exist "frontend\.env" (
+  echo Criando frontend\.env...
+  copy "frontend\.env.example" "frontend\.env" > nul
+)
 echo Iniciando banco local...
 start "barbearia-db" cmd /k "cd /d backend && node scripts/start-db.js"
 
