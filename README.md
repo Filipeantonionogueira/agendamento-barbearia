@@ -54,6 +54,13 @@ start-dev.bat
 
 Ele abre banco, backend e frontend em janelas separadas.
 
+Se o banco local der erro na primeira inicializacao, feche as janelas abertas e rode:
+
+```bat
+reset-db.bat
+start-dev.bat
+```
+
 Se preferir Docker:
 
 ```bash
