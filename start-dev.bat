@@ -17,6 +17,8 @@ node scripts/wait-for-db.js
 if errorlevel 1 goto erro
 node scripts/apply-migration.js
 if errorlevel 1 goto erro
+call npx.cmd prisma generate
+if errorlevel 1 goto erro
 call npx.cmd prisma db seed
 if errorlevel 1 goto erro
 cd /d "%~dp0"
