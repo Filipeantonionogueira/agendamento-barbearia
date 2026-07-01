@@ -1,0 +1,1 @@
+C:/Users/Filipe/OneDrive/Documentos/barbearia/backend/node_modules/@embedded-postgres/windows-x64/native/bin/postgres.exe "-D" "./.postgres-data-utf8" "-p" "5432"
