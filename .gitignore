@@ -1,5 +1,26 @@
 node_modules/
 .npm-cache/
 dist/
+
+# Segredos e variaveis de ambiente
 .env
+.env.*
+!.env.example
+
+# Logs
 *.log
+
+# Dados do banco (PostgreSQL embarcado) — NUNCA versionar
+.postgres-data/
+.postgres-data-pg16/
+.postgres-data-utf8/
+backend/.postgres-data/
+backend/.postgres-data-pg16/
+backend/.postgres-data-utf8/
+
+# Artefatos de runtime
+.db-job-id
+
+# Arquivos enviados pelos usuarios (servir via storage/CDN em producao)
+uploads/
+backend/uploads/

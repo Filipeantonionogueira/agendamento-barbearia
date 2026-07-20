@@ -1,10 +1,13 @@
 import { z } from "zod";
-import { barberRepository } from "../repositories/barberRepository.js";
 import { blockRepository } from "../repositories/blockRepository.js";
+import { professionalService } from "./professionalService.js";
 import { dateOnly, minutesFromTime } from "../utils/time.js";
 import { AppError } from "../utils/AppError.js";
 
+const professionalIdSchema = z.string().uuid();
+
 const schema = z.object({
+  professionalId: professionalIdSchema,
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   startTime: z.string().regex(/^\d{2}:\d{2}$/).optional().nullable(),
   endTime: z.string().regex(/^\d{2}:\d{2}$/).optional().nullable(),
@@ -12,20 +15,30 @@ const schema = z.object({
 });
 
 export const blockService = {
-  list() {
-    return blockRepository.list(barberRepository.defaultId);
+  async list(professionalId) {
+    const id = professionalIdSchema.parse(professionalId);
+    await professionalService.getActiveOrThrow(id);
+    return blockRepository.list(id);
   },
-  create(input) {
+  async create(input) {
     const data = schema.parse(input);
+    await professionalService.getActiveOrThrow(data.professionalId);
     if ((data.startTime && !data.endTime) || (!data.startTime && data.endTime)) {
       throw new AppError("Informe inicio e fim do bloqueio.", 400);
     }
     if (data.startTime && minutesFromTime(data.startTime) >= minutesFromTime(data.endTime)) {
       throw new AppError("Horario inicial deve ser menor que o final.", 400);
     }
-    return blockRepository.create({ ...data, date: dateOnly(data.date), barberId: barberRepository.defaultId });
+    return blockRepository.create({
+      date: dateOnly(data.date),
+      startTime: data.startTime,
+      endTime: data.endTime,
+      reason: data.reason,
+      professionalId: data.professionalId
+    });
   },
-  remove(id) {
-    return blockRepository.remove(id, barberRepository.defaultId);
+  async remove(id, professionalId) {
+    const parsedProfessionalId = professionalIdSchema.parse(professionalId);
+    return blockRepository.remove(id, parsedProfessionalId);
   }
 };

@@ -3,10 +3,77 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Barbearia Prime</title>
+    <meta name="theme-color" content="#151515" />
+
+    <title>Barbearia Prime | Agendamento online de corte e barba</title>
+    <meta
+      name="description"
+      content="Agende seu corte, barba ou tratamento na Barbearia Prime em poucos cliques. Escolha o profissional, veja horarios livres em tempo real e confirme online."
+    />
+    <link rel="canonical" href="https://barbeariaprime.com.br/" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph (WhatsApp, Facebook, LinkedIn) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Barbearia Prime" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:title" content="Barbearia Prime | Agendamento online de corte e barba" />
+    <meta
+      property="og:description"
+      content="Escolha o profissional, veja horarios livres em tempo real e confirme seu agendamento online."
+    />
+    <meta property="og:url" content="https://barbeariaprime.com.br/" />
+    <meta
+      property="og:image"
+      content="https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=1200&q=80"
+    />
+    <meta property="og:image:alt" content="Ambiente da Barbearia Prime" />
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Barbearia Prime | Agendamento online" />
+    <meta name="twitter:description" content="Agende corte e barba online. Horarios em tempo real." />
+    <meta
+      name="twitter:image"
+      content="https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=1200&q=80"
+    />
+
+    <!-- Performance: conexao antecipada com o CDN de imagens -->
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin />
+    <link rel="dns-prefetch" href="https://images.unsplash.com" />
+
+    <!-- Schema.org: negocio local (rich results no Google) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "HairSalon",
+        "name": "Barbearia Prime",
+        "description": "Barbearia especializada em corte, barba e tratamentos, com agendamento online.",
+        "url": "https://barbeariaprime.com.br/",
+        "image": "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=1200&q=80",
+        "priceRange": "$$",
+        "currenciesAccepted": "BRL",
+        "areaServed": "BR",
+        "potentialAction": {
+          "@type": "ReserveAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://barbeariaprime.com.br/",
+            "actionPlatform": [
+              "http://schema.org/DesktopWebPlatform",
+              "http://schema.org/MobileWebPlatform"
+            ]
+          },
+          "result": { "@type": "Reservation", "name": "Agendamento de servico" }
+        }
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      Para agendar online na Barbearia Prime, habilite o JavaScript no seu navegador ou entre em contato pelo WhatsApp.
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

@@ -25,6 +25,7 @@ async function main() {
     }
   });
 
+  // Mantido por compatibilidade historica; a autenticacao agora usa User.
   await prisma.admin.upsert({
     where: { username: "admin" },
     update: {},
@@ -42,11 +43,41 @@ async function main() {
     }
   }
 
+  let professional = await prisma.professional.findFirst({ where: { barberId: barber.id }, orderBy: { createdAt: "asc" } });
+  if (!professional) {
+    professional = await prisma.professional.create({
+      data: { barberId: barber.id, name: barber.shopName, active: true, displayOrder: 0 }
+    });
+  }
+
+  // Usuario Owner (login: admin@local / admin123) com papeis acumulativos, atuando como barbeiro.
+  const ownerUser = await prisma.user.upsert({
+    where: { email: "admin@barbearia.local" },
+    update: {},
+    create: {
+      barberId: barber.id,
+      email: "admin@barbearia.local",
+      passwordHash: await bcrypt.hash("admin123", 12),
+      name: "Administrador",
+      authProvider: "local"
+    }
+  });
+  for (const role of ["OWNER", "ADMIN", "BARBER"]) {
+    await prisma.userRole.upsert({
+      where: { userId_role: { userId: ownerUser.id, role } },
+      update: {},
+      create: { userId: ownerUser.id, role }
+    });
+  }
+  if (!professional.userId) {
+    await prisma.professional.update({ where: { id: professional.id }, data: { userId: ownerUser.id } });
+  }
+
   for (const dayOfWeek of [1, 2, 3, 4, 5, 6]) {
     await prisma.availability.upsert({
-      where: { barberId_dayOfWeek: { barberId: barber.id, dayOfWeek } },
+      where: { professionalId_dayOfWeek: { professionalId: professional.id, dayOfWeek } },
       update: {},
-      create: { barberId: barber.id, dayOfWeek, startTime: "09:00", endTime: "19:00", active: true }
+      create: { professionalId: professional.id, dayOfWeek, startTime: "09:00", endTime: "19:00", active: true }
     });
   }
 }

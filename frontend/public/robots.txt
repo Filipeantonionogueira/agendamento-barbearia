@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /$
+Allow: /cadastro
+Allow: /login
+
+# Areas privadas nao devem ser indexadas.
+Disallow: /conta
+Disallow: /conta/
+Disallow: /admin
+Disallow: /admin/
+Disallow: /recuperar-senha
+
+Sitemap: https://barbeariaprime.com.br/sitemap.xml

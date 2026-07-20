@@ -14,15 +14,99 @@ enum AppointmentStatus {
   CANCELADO
 }
 
+enum Role {
+  OWNER
+  ADMIN
+  BARBER
+  CLIENT
+}
+
+enum CouponType {
+  PERCENT
+  FIXED
+}
+
 model Barber {
+  id               String         @id @default(uuid())
+  shopName         String         @default("Barbearia Prime")
+  whatsappNumber   String         @default("5511999999999")
+  heroImageUrl     String?
+  aboutText        String?
+  addressLine      String?
+  openingHoursText String?
+  admins           Admin[]
+  users            User[]
+  services         Service[]
+  professionals    Professional[]
+  appointments     Appointment[]
+  coupons          Coupon[]
+  gallery          GalleryItem[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+}
+
+model User {
+  id            String         @id @default(uuid())
+  barberId      String         @map("barbeiro_id")
+  barber        Barber         @relation(fields: [barberId], references: [id])
+  email         String         @unique
+  passwordHash  String?
+  name          String
+  phone         String?
+  photoUrl      String?
+  googleId      String?        @unique @map("google_id")
+  authProvider  String         @default("local") @map("auth_provider")
+  active        Boolean        @default(true)
+  roles          UserRole[]
+  refreshTokens  RefreshToken[]
+  passwordResets PasswordResetToken[]
+  favorites      Favorite[]
+  loyaltyEntries LoyaltyTransaction[]
+  reviews        Review[]
+  notifications  Notification[]
+  waitlist       WaitlistEntry[]
+  professional   Professional?
+  client         Client?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  deletedAt     DateTime?
+}
+
+model UserRole {
+  userId String @map("user_id")
+  role   Role
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, role])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model Professional {
   id             String          @id @default(uuid())
-  shopName       String          @default("Barbearia Prime")
-  whatsappNumber String          @default("5511999999999")
-  admins         Admin[]
-  services       Service[]
+  barberId       String          @map("barbeiro_id")
+  barber         Barber          @relation(fields: [barberId], references: [id])
+  userId         String?         @unique @map("user_id")
+  user           User?           @relation(fields: [userId], references: [id])
+  name           String
+  photoUrl       String?
+  bio            String?
+  active         Boolean         @default(true)
+  displayOrder   Int             @default(0)
   availabilities Availability[]
   blocks         ScheduleBlock[]
   appointments   Appointment[]
+  favorites      Favorite[]
+  reviews        Review[]
+  waitlist       WaitlistEntry[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 }
@@ -40,7 +124,8 @@ model Admin {
 model RefreshToken {
   id        String   @id @default(uuid())
   tokenHash String
-  adminId   String
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   createdAt DateTime @default(now())
 }
@@ -55,39 +140,42 @@ model Service {
   estimatedMinutes    Int
   active              Boolean              @default(true)
   appointmentServices AppointmentService[]
+  favorites           Favorite[]
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
 }
 
 model Availability {
-  id        String   @id @default(uuid())
-  barberId  String   @map("barbeiro_id")
-  barber    Barber   @relation(fields: [barberId], references: [id])
-  dayOfWeek Int
-  startTime String
-  endTime   String
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String       @id @default(uuid())
+  professionalId String       @map("profissional_id")
+  professional   Professional @relation(fields: [professionalId], references: [id])
+  dayOfWeek      Int
+  startTime      String
+  endTime        String
+  active         Boolean      @default(true)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
-  @@unique([barberId, dayOfWeek])
+  @@unique([professionalId, dayOfWeek])
 }
 
 model ScheduleBlock {
-  id        String   @id @default(uuid())
-  barberId  String   @map("barbeiro_id")
-  barber    Barber   @relation(fields: [barberId], references: [id])
-  date      DateTime
-  startTime String?
-  endTime   String?
-  reason    String?
-  createdAt DateTime @default(now())
+  id             String       @id @default(uuid())
+  professionalId String       @map("profissional_id")
+  professional   Professional @relation(fields: [professionalId], references: [id])
+  date           DateTime
+  startTime      String?
+  endTime        String?
+  reason         String?
+  createdAt      DateTime     @default(now())
 }
 
 model Client {
   id           String        @id @default(uuid())
   name         String
   phone        String?
+  userId       String?       @unique @map("user_id")
+  user         User?         @relation(fields: [userId], references: [id])
   appointments Appointment[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
@@ -97,6 +185,8 @@ model Appointment {
   id                  String               @id @default(uuid())
   barberId            String               @map("barbeiro_id")
   barber              Barber               @relation(fields: [barberId], references: [id])
+  professionalId      String               @map("profissional_id")
+  professional        Professional         @relation(fields: [professionalId], references: [id])
   clientId            String
   client              Client               @relation(fields: [clientId], references: [id])
   startAt             DateTime
@@ -104,11 +194,170 @@ model Appointment {
   status              AppointmentStatus    @default(PENDENTE)
   totalPriceCents     Int
   totalMinutes        Int
+  notes               String?
+  cancelReason        String?              @map("cancel_reason")
+  canceledAt          DateTime?            @map("canceled_at")
+  discountCents       Int                  @default(0) @map("discount_cents")
+  couponId            String?              @map("coupon_id")
+  review              Review?
+  couponUsage         CouponUsage?
   appointmentServices AppointmentService[]
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
 
   @@index([barberId, startAt, endAt])
+  @@index([professionalId, startAt, endAt])
+  @@index([clientId])
+  @@index([status, startAt])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?  @map("user_id")
+  actorName String?  @map("actor_name")
+  action    String
+  entity    String?
+  entityId  String?  @map("entity_id")
+  metadata  String?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([entity, entityId])
+}
+
+// Analytics anonimo: sem IP e sem dado pessoal (LGPD - minimizacao de dados).
+model SiteVisit {
+  id        String   @id @default(uuid())
+  sessionId String   @map("session_id")
+  path      String
+  referrer  String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([sessionId])
+}
+
+model GalleryItem {
+  id           String   @id @default(uuid())
+  barberId     String   @map("barbeiro_id")
+  barber       Barber   @relation(fields: [barberId], references: [id])
+  url          String
+  title        String?
+  category     String   @default("GERAL")
+  displayOrder Int      @default(0) @map("display_order")
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([barberId, active, displayOrder])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category  String
+  title     String
+  body      String?
+  link      String?
+  read      Boolean  @default(false)
+  archived  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, read, archived])
+}
+
+model WaitlistEntry {
+  id             String       @id @default(uuid())
+  professionalId String       @map("professional_id")
+  professional   Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  userId         String       @map("user_id")
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date           DateTime
+  serviceIds     String       @map("service_ids")
+  status         String       @default("WAITING")
+  notifiedAt     DateTime?    @map("notified_at")
+  createdAt      DateTime     @default(now())
+
+  @@index([professionalId, date, status])
+}
+
+model Coupon {
+  id            String        @id @default(uuid())
+  barberId      String        @map("barbeiro_id")
+  barber        Barber        @relation(fields: [barberId], references: [id])
+  code          String        @unique
+  description   String?
+  type          CouponType    @default(PERCENT)
+  value         Int
+  minPriceCents Int           @default(0) @map("min_price_cents")
+  maxUses       Int?          @map("max_uses")
+  usedCount     Int           @default(0) @map("used_count")
+  active        Boolean       @default(true)
+  expiresAt     DateTime?     @map("expires_at")
+  usages        CouponUsage[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model CouponUsage {
+  id            String      @id @default(uuid())
+  couponId      String      @map("coupon_id")
+  coupon        Coupon      @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  appointmentId String      @unique @map("appointment_id")
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  userId        String?     @map("user_id")
+  discountCents Int         @map("discount_cents")
+  createdAt     DateTime    @default(now())
+
+  @@index([couponId])
+}
+
+model Review {
+  id             String       @id @default(uuid())
+  appointmentId  String       @unique @map("appointment_id")
+  appointment    Appointment  @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  userId         String       @map("user_id")
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  professionalId String       @map("professional_id")
+  professional   Professional @relation(fields: [professionalId], references: [id])
+  rating         Int
+  comment        String?
+  photoUrl       String?      @map("photo_url")
+  reply          String?
+  repliedAt      DateTime?    @map("replied_at")
+  published      Boolean      @default(true)
+  createdAt      DateTime     @default(now())
+
+  @@index([professionalId])
+  @@index([published, createdAt])
+}
+
+model LoyaltyTransaction {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointmentId String?  @unique @map("appointment_id")
+  points        Int
+  reason        String
+  createdAt     DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Favorite {
+  id             String        @id @default(uuid())
+  userId         String        @map("user_id")
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  serviceId      String?       @map("service_id")
+  service        Service?      @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  professionalId String?       @map("professional_id")
+  professional   Professional? @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  createdAt      DateTime      @default(now())
+
+  @@unique([userId, serviceId])
+  @@unique([userId, professionalId])
 }
 
 model AppointmentService {

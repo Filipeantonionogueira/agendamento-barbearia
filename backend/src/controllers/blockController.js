@@ -1,9 +1,9 @@
 import { blockService } from "../services/blockService.js";
 
 export const blockController = {
-  async list(_req, res, next) {
+  async list(req, res, next) {
     try {
-      res.json(await blockService.list());
+      res.json(await blockService.list(req.query.professionalId));
     } catch (error) {
       next(error);
     }
@@ -17,7 +17,7 @@ export const blockController = {
   },
   async remove(req, res, next) {
     try {
-      res.json(await blockService.remove(req.params.id));
+      res.json(await blockService.remove(req.params.id, req.query.professionalId));
     } catch (error) {
       next(error);
     }

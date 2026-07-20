@@ -1,19 +1,19 @@
 import { prisma } from "../config/prisma.js";
 
 export const availabilityRepository = {
-  list(barberId) {
-    return prisma.availability.findMany({ where: { barberId }, orderBy: { dayOfWeek: "asc" } });
+  list(professionalId) {
+    return prisma.availability.findMany({ where: { professionalId }, orderBy: { dayOfWeek: "asc" } });
   },
-  findByDay(barberId, dayOfWeek) {
-    return prisma.availability.findUnique({ where: { barberId_dayOfWeek: { barberId, dayOfWeek } } });
+  findByDay(professionalId, dayOfWeek) {
+    return prisma.availability.findUnique({ where: { professionalId_dayOfWeek: { professionalId, dayOfWeek } } });
   },
-  replaceMany(barberId, items) {
+  replaceMany(professionalId, items) {
     return prisma.$transaction(
       items.map((item) =>
         prisma.availability.upsert({
-          where: { barberId_dayOfWeek: { barberId, dayOfWeek: item.dayOfWeek } },
+          where: { professionalId_dayOfWeek: { professionalId, dayOfWeek: item.dayOfWeek } },
           update: item,
-          create: { ...item, barberId }
+          create: { ...item, professionalId }
         })
       )
     );
