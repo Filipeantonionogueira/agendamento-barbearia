@@ -45,7 +45,6 @@ afterAll(async () => {
       await prisma.client.delete({ where: { id: user.client.id } });
     }
     await prisma.notification.deleteMany({ where: { userId: user.id } });
-    await prisma.loyaltyTransaction.deleteMany({ where: { userId: user.id } });
     await prisma.userRole.deleteMany({ where: { userId: user.id } });
     await prisma.refreshToken.deleteMany({ where: { userId: user.id } });
     await prisma.user.delete({ where: { id: user.id } });

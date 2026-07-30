@@ -2,10 +2,13 @@ import { env } from "../config/env.js";
 import { authService } from "../services/authService.js";
 import { auditService } from "../services/auditService.js";
 
+// Em producao o frontend (Vercel) e a API (Railway) ficam em dominios diferentes,
+// entao o cookie precisa ser SameSite=None + Secure para o navegador envia-lo.
+// Em desenvolvimento (http://localhost) `None` seria descartado: usamos `lax`.
 const cookieOptions = {
   httpOnly: true,
-  sameSite: "lax",
-  secure: env.nodeEnv === "production"
+  sameSite: env.isProduction ? "none" : "lax",
+  secure: env.isProduction
 };
 
 const ACCESS_MAX_AGE = 15 * 60 * 1000;
@@ -78,8 +81,9 @@ export const authController = {
     }
   },
   logout(_req, res) {
-    res.clearCookie("accessToken");
-    res.clearCookie("refreshToken");
+    // Mesmos atributos do set: sem isso o navegador nao remove o cookie.
+    res.clearCookie("accessToken", cookieOptions);
+    res.clearCookie("refreshToken", cookieOptions);
     res.json({ ok: true });
   }
 };

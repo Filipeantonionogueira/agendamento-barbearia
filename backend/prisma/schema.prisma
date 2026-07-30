@@ -4,7 +4,10 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  // Runtime: no Supabase use o pooler (porta 6543) com ?pgbouncer=true.
   url      = env("DATABASE_URL")
+  // Migracoes: conexao direta (porta 5432). Fora do Supabase, aponte para a mesma URL.
+  directUrl = env("DIRECT_URL")
 }
 
 enum AppointmentStatus {
@@ -21,11 +24,6 @@ enum Role {
   CLIENT
 }
 
-enum CouponType {
-  PERCENT
-  FIXED
-}
-
 model Barber {
   id               String         @id @default(uuid())
   shopName         String         @default("Barbearia Prime")
@@ -39,8 +37,8 @@ model Barber {
   services         Service[]
   professionals    Professional[]
   appointments     Appointment[]
-  coupons          Coupon[]
   gallery          GalleryItem[]
+  siteContent      SiteContent?
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 }
@@ -61,7 +59,6 @@ model User {
   refreshTokens  RefreshToken[]
   passwordResets PasswordResetToken[]
   favorites      Favorite[]
-  loyaltyEntries LoyaltyTransaction[]
   reviews        Review[]
   notifications  Notification[]
   waitlist       WaitlistEntry[]
@@ -99,6 +96,7 @@ model Professional {
   name           String
   photoUrl       String?
   bio            String?
+  specialty      String?
   active         Boolean         @default(true)
   displayOrder   Int             @default(0)
   availabilities Availability[]
@@ -197,10 +195,7 @@ model Appointment {
   notes               String?
   cancelReason        String?              @map("cancel_reason")
   canceledAt          DateTime?            @map("canceled_at")
-  discountCents       Int                  @default(0) @map("discount_cents")
-  couponId            String?              @map("coupon_id")
   review              Review?
-  couponUsage         CouponUsage?
   appointmentServices AppointmentService[]
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
@@ -283,37 +278,6 @@ model WaitlistEntry {
   @@index([professionalId, date, status])
 }
 
-model Coupon {
-  id            String        @id @default(uuid())
-  barberId      String        @map("barbeiro_id")
-  barber        Barber        @relation(fields: [barberId], references: [id])
-  code          String        @unique
-  description   String?
-  type          CouponType    @default(PERCENT)
-  value         Int
-  minPriceCents Int           @default(0) @map("min_price_cents")
-  maxUses       Int?          @map("max_uses")
-  usedCount     Int           @default(0) @map("used_count")
-  active        Boolean       @default(true)
-  expiresAt     DateTime?     @map("expires_at")
-  usages        CouponUsage[]
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-}
-
-model CouponUsage {
-  id            String      @id @default(uuid())
-  couponId      String      @map("coupon_id")
-  coupon        Coupon      @relation(fields: [couponId], references: [id], onDelete: Cascade)
-  appointmentId String      @unique @map("appointment_id")
-  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
-  userId        String?     @map("user_id")
-  discountCents Int         @map("discount_cents")
-  createdAt     DateTime    @default(now())
-
-  @@index([couponId])
-}
-
 model Review {
   id             String       @id @default(uuid())
   appointmentId  String       @unique @map("appointment_id")
@@ -332,18 +296,6 @@ model Review {
 
   @@index([professionalId])
   @@index([published, createdAt])
-}
-
-model LoyaltyTransaction {
-  id            String   @id @default(uuid())
-  userId        String   @map("user_id")
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  appointmentId String?  @unique @map("appointment_id")
-  points        Int
-  reason        String
-  createdAt     DateTime @default(now())
-
-  @@index([userId])
 }
 
 model Favorite {
@@ -369,4 +321,14 @@ model AppointmentService {
   service       Service     @relation(fields: [serviceId], references: [id])
 
   @@id([appointmentId, serviceId])
+}
+
+// CMS da landing page: todo o conteudo editavel fica num JSON versionado,
+// permitindo o admin criar/reordenar secoes sem migracao de banco.
+model SiteContent {
+  id        String   @id @default(uuid())
+  barberId  String   @unique @map("barbeiro_id")
+  barber    Barber   @relation(fields: [barberId], references: [id])
+  data      String
+  updatedAt DateTime @updatedAt
 }

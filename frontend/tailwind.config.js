@@ -1,73 +1,94 @@
+/**
+ * Design tokens.
+ *
+ * Cores semanticas (superficie, texto, borda, marca) sao variaveis CSS definidas
+ * em styles.css para `:root` e `.dark` — a mesma classe funciona nos dois temas.
+ * Cores fixas de marca (ink, gold) nao trocam: garantem contraste sobre o dourado
+ * e nos blocos escuros de destaque.
+ */
+const token = (name) => `rgb(var(${name}) / <alpha-value>)`;
+
 export default {
+  darkMode: "class",
   content: ["./index.html", "./src/**/*.{js,jsx}"],
   theme: {
     extend: {
       colors: {
+        // Marca fixa (nao inverte com o tema).
         ink: {
-          DEFAULT: "#151515",
-          900: "#0E0E0E",
-          700: "#2A2A2A",
-          500: "#4A4A4A",
-          300: "#8A8A8A"
+          DEFAULT: "#0F0F11",
+          900: "#08080A",
+          700: "#26262B",
+          500: "#4A4A52",
+          300: "#8A8A93"
         },
         gold: {
-          DEFAULT: "#C79A3B",
-          600: "#8A6418",
-          200: "#E8D09A",
-          100: "#FFF8E8"
+          DEFAULT: "#C9A24C",
+          600: "#8C6D22",
+          400: "#DCBB72",
+          200: "#EFDCAE",
+          100: "#FBF3E1"
         },
-        paper: "#F8F6F1",
+        // Semanticas (invertem no modo escuro).
+        paper: token("--paper"),
         surface: {
-          DEFAULT: "#FFFFFF",
-          subtle: "#FAFAF8"
+          DEFAULT: token("--surface"),
+          subtle: token("--surface-subtle"),
+          raised: token("--surface-raised")
         },
         border: {
-          DEFAULT: "#E4E4E7",
-          strong: "#D4D4D8"
+          DEFAULT: token("--border"),
+          strong: token("--border-strong")
         },
         text: {
-          primary: "#151515",
-          secondary: "#52525B",
-          muted: "#A1A1AA",
-          inverse: "#FFFFFF"
+          primary: token("--text-primary"),
+          secondary: token("--text-secondary"),
+          muted: token("--text-muted"),
+          inverse: token("--text-inverse")
+        },
+        brand: {
+          DEFAULT: token("--brand"),
+          fg: token("--brand-fg"),
+          soft: token("--brand-soft")
         },
         feedback: {
-          success: "#2E7D46",
-          "success-bg": "#EAF6EE",
-          warning: "#B4790F",
-          "warning-bg": "#FFF6E5",
-          danger: "#C23B3B",
-          "danger-bg": "#FBEAEA",
-          info: "#2563A8",
-          "info-bg": "#EAF2FB"
+          success: token("--success"),
+          "success-bg": token("--success-bg"),
+          warning: token("--warning"),
+          "warning-bg": token("--warning-bg"),
+          danger: token("--danger"),
+          "danger-bg": token("--danger-bg"),
+          info: token("--info"),
+          "info-bg": token("--info-bg")
         }
       },
-      spacing: {
-        1: "4px",
-        2: "8px",
-        3: "12px",
-        4: "16px",
-        5: "20px",
-        6: "24px",
-        8: "32px",
-        10: "40px",
-        12: "48px",
-        16: "64px",
-        20: "80px",
-        24: "96px"
+      fontFamily: {
+        sans: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
+        display: ['"Playfair Display"', "Georgia", "serif"]
+      },
+      fontSize: {
+        "display-sm": ["2.25rem", { lineHeight: "1.1", letterSpacing: "-0.02em" }],
+        "display-md": ["3rem", { lineHeight: "1.05", letterSpacing: "-0.025em" }],
+        "display-lg": ["4rem", { lineHeight: "1", letterSpacing: "-0.03em" }],
+        "display-xl": ["5rem", { lineHeight: "0.98", letterSpacing: "-0.035em" }]
       },
       borderRadius: {
-        sm: "6px",
-        DEFAULT: "8px",
-        md: "10px",
-        lg: "14px",
-        xl: "20px"
+        sm: "8px",
+        DEFAULT: "12px",
+        md: "14px",
+        lg: "18px",
+        xl: "24px",
+        "2xl": "32px"
       },
       boxShadow: {
-        soft: "0 16px 48px rgba(21, 21, 21, 0.08)",
-        xs: "0 1px 2px rgba(21, 21, 21, 0.06)",
-        sm: "0 4px 12px rgba(21, 21, 21, 0.06)",
-        lg: "0 24px 64px rgba(21, 21, 21, 0.14)"
+        xs: "0 1px 2px rgb(var(--shadow) / 0.06)",
+        sm: "0 4px 16px rgb(var(--shadow) / 0.08)",
+        md: "0 12px 32px rgb(var(--shadow) / 0.10)",
+        lg: "0 24px 64px rgb(var(--shadow) / 0.16)",
+        soft: "0 18px 56px rgb(var(--shadow) / 0.12)"
+      },
+      backgroundImage: {
+        "gold-sheen": "linear-gradient(120deg, #C9A24C 0%, #EFDCAE 45%, #C9A24C 100%)"
       },
       keyframes: {
         fadeIn: { from: { opacity: 0 }, to: { opacity: 1 } },
@@ -75,8 +96,8 @@ export default {
         shimmer: { "0%": { backgroundPosition: "-200% 0" }, "100%": { backgroundPosition: "200% 0" } }
       },
       animation: {
-        fadeIn: "fadeIn .2s ease-out",
-        slideUp: "slideUp .25s ease-out",
+        fadeIn: "fadeIn .25s ease-out",
+        slideUp: "slideUp .3s cubic-bezier(.2,.8,.2,1)",
         shimmer: "shimmer 1.6s linear infinite"
       }
     }

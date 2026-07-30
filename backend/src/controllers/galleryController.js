@@ -1,5 +1,6 @@
 import { galleryService } from "../services/galleryService.js";
 import { auditService } from "../services/auditService.js";
+import { storageService } from "../services/storageService.js";
 import { AppError } from "../utils/AppError.js";
 
 export const galleryController = {
@@ -42,13 +43,14 @@ export const galleryController = {
       next(error);
     }
   },
-  // Recebe o arquivo e devolve a URL publica para uso em galeria/perfil/servicos.
+  // Recebe o arquivo, envia ao storage e devolve a URL publica
+  // (usada por galeria, fotos de profissionais e imagens da landing page).
   async upload(req, res, next) {
     try {
       if (!req.file) throw new AppError("Nenhum arquivo enviado.", 400);
-      const url = `/uploads/${req.file.filename}`;
-      auditService.record({ action: "FILE_UPLOADED", entity: "Upload", entityId: req.file.filename, req });
-      res.status(201).json({ url, filename: req.file.filename, sizeBytes: req.file.size });
+      const stored = await storageService.saveImage(req.file);
+      auditService.record({ action: "FILE_UPLOADED", entity: "Upload", entityId: stored.filename, req });
+      res.status(201).json(stored);
     } catch (error) {
       next(error);
     }

@@ -1,15 +1,15 @@
 import React from "react";
-import { CalendarDays, Clock, Scissors, Settings, Users, Wallet, Ticket, Star, UserCircle, ShieldCheck, Images } from "lucide-react";
+import { CalendarDays, Clock, Scissors, Settings, Users, Wallet, Star, UserCircle, ShieldCheck, Images, Layout } from "lucide-react";
 import { AdminShell } from "../components/layout/AdminShell.jsx";
 import { Agenda } from "../components/admin/Agenda.jsx";
 import { Disponibilidade } from "../components/admin/Disponibilidade.jsx";
 import { Servicos } from "../components/admin/Servicos.jsx";
 import { Profissionais } from "../components/admin/Profissionais.jsx";
 import { Clientes } from "../components/admin/Clientes.jsx";
-import { Cupons } from "../components/admin/Cupons.jsx";
 import { Avaliacoes } from "../components/admin/Avaliacoes.jsx";
 import { Dashboard } from "../components/admin/Dashboard.jsx";
 import { GaleriaAdmin } from "../components/admin/Galeria.jsx";
+import { LandingCms } from "../components/admin/LandingCms.jsx";
 import { Auditoria } from "../components/admin/Auditoria.jsx";
 import { Config } from "../components/admin/Config.jsx";
 import { usePageMeta } from "../hooks/usePageMeta.js";
@@ -20,9 +20,9 @@ const TABS = [
   { id: "servicos", label: "Servicos", icon: Scissors },
   { id: "profissionais", label: "Profissionais", icon: Users },
   { id: "clientes", label: "Clientes", icon: UserCircle },
-  { id: "cupons", label: "Cupons", icon: Ticket },
   { id: "avaliacoes", label: "Avaliacoes", icon: Star },
   { id: "galeria", label: "Galeria", icon: Images },
+  { id: "landing", label: "Landing page", icon: Layout },
   { id: "dashboard", label: "Dashboard", icon: Wallet },
   { id: "auditoria", label: "Auditoria", icon: ShieldCheck },
   { id: "config", label: "Config", icon: Settings }
@@ -39,9 +39,9 @@ export function AdminPage() {
       {tab === "servicos" && <Servicos />}
       {tab === "profissionais" && <Profissionais />}
       {tab === "clientes" && <Clientes />}
-      {tab === "cupons" && <Cupons />}
       {tab === "avaliacoes" && <Avaliacoes />}
       {tab === "galeria" && <GaleriaAdmin />}
+      {tab === "landing" && <LandingCms />}
       {tab === "dashboard" && <Dashboard />}
       {tab === "auditoria" && <Auditoria />}
       {tab === "config" && <Config />}

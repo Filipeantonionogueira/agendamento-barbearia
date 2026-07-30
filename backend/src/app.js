@@ -12,9 +12,7 @@ import { blockRoutes } from "./routes/blockRoutes.js";
 import { dashboardRoutes } from "./routes/dashboardRoutes.js";
 import { configRoutes } from "./routes/configRoutes.js";
 import { favoriteRoutes } from "./routes/favoriteRoutes.js";
-import { loyaltyRoutes } from "./routes/loyaltyRoutes.js";
 import { reviewRoutes } from "./routes/reviewRoutes.js";
-import { couponRoutes } from "./routes/couponRoutes.js";
 import { notificationRoutes } from "./routes/notificationRoutes.js";
 import { waitlistRoutes } from "./routes/waitlistRoutes.js";
 import { adminClientRoutes } from "./routes/adminClientRoutes.js";
@@ -94,9 +92,7 @@ app.use("/api/bloqueios", blockRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/configuracoes", configRoutes);
 app.use("/api/favoritos", favoriteRoutes);
-app.use("/api/fidelidade", loyaltyRoutes);
 app.use("/api/avaliacoes", reviewRoutes);
-app.use("/api/cupons", couponRoutes);
 app.use("/api/notificacoes", notificationRoutes);
 app.use("/api/lista-espera", waitlistRoutes);
 app.use("/api/clientes", adminClientRoutes);
@@ -105,7 +101,8 @@ app.use("/api/conta", accountRoutes);
 app.use("/api/galeria", galleryRoutes);
 app.use("/api/analytics", analyticsRoutes);
 
-// Arquivos enviados: somente leitura, sem execucao e sem sniffing de tipo.
+// Fallback de desenvolvimento: em producao as imagens ficam no Cloudinary.
+// Somente leitura, sem execucao e sem sniffing de tipo.
 app.use(
   "/uploads",
   express.static(UPLOAD_DIR, {
@@ -115,6 +112,8 @@ app.use(
     setHeaders(res) {
       res.setHeader("X-Content-Type-Options", "nosniff");
       res.setHeader("Content-Disposition", "inline");
+      // O frontend roda em outro dominio (Vercel): o CORP padrao bloquearia a imagem.
+      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
     }
   })
 );

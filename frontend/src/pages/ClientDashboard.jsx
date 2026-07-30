@@ -7,7 +7,6 @@ import { Badge } from "../components/ui/Badge.jsx";
 import { EmptyState } from "../components/ui/EmptyState.jsx";
 import { useAuth } from "../context/AuthProvider.jsx";
 import { useFavorites } from "../hooks/useFavorites.js";
-import { LoyaltyProgress } from "../components/client/LoyaltyProgress.jsx";
 import { api } from "../lib/api.js";
 import { money } from "../lib/format.js";
 import { usePageMeta } from "../hooks/usePageMeta.js";
@@ -26,7 +25,6 @@ export function ClientDashboard() {
   const { user } = useAuth();
   const { favorites } = useFavorites();
   const [appointments, setAppointments] = React.useState([]);
-  const [loyalty, setLoyalty] = React.useState(null);
   const [loaded, setLoaded] = React.useState(false);
 
   React.useEffect(() => {
@@ -34,7 +32,6 @@ export function ClientDashboard() {
       .then(setAppointments)
       .catch(() => setAppointments([]))
       .finally(() => setLoaded(true));
-    api("/fidelidade").then(setLoyalty).catch(() => setLoyalty(null));
   }, []);
 
   const now = new Date();
@@ -86,14 +83,6 @@ export function ClientDashboard() {
           )}
         </Card>
       </div>
-
-      {loyalty && (
-        <Link to="/conta/fidelidade" className="mt-4 block">
-          <Card className="transition hover:border-gold">
-            <LoyaltyProgress summary={loyalty} compact />
-          </Card>
-        </Link>
-      )}
 
       <div className="mt-4 grid gap-3 sm:grid-cols-3">
         <Link to="/" className="flex items-center gap-3 rounded-lg border border-border bg-surface p-4 transition hover:border-gold">

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { CalendarPlus, XCircle, Award, Star, Bell, Tag, Archive, Check } from "lucide-react";
+import { CalendarPlus, XCircle, Star, Bell, Archive, Check } from "lucide-react";
 import { ClientShell } from "../components/client/ClientShell.jsx";
 import { Button } from "../components/ui/Button.jsx";
 import { EmptyState } from "../components/ui/EmptyState.jsx";
@@ -10,9 +10,7 @@ import { usePageMeta } from "../hooks/usePageMeta.js";
 const CATEGORY_ICON = {
   AGENDAMENTO: CalendarPlus,
   CANCELAMENTO: XCircle,
-  FIDELIDADE: Award,
   AVALIACAO: Star,
-  PROMOCAO: Tag,
   SISTEMA: Bell
 };
 

@@ -1,13 +1,12 @@
 import React from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Scissors, LayoutDashboard, User, LogOut, CalendarPlus, History, Award, Bell } from "lucide-react";
+import { Scissors, LayoutDashboard, User, LogOut, CalendarPlus, History, Bell } from "lucide-react";
 import { useAuth } from "../../context/AuthProvider.jsx";
 import { api } from "../../lib/api.js";
 
 const NAV = [
   { to: "/conta", label: "Painel", icon: LayoutDashboard },
   { to: "/conta/historico", label: "Historico", icon: History },
-  { to: "/conta/fidelidade", label: "Fidelidade", icon: Award },
   { to: "/conta/notificacoes", label: "Notificacoes", icon: Bell, badge: true },
   { to: "/conta/perfil", label: "Perfil", icon: User }
 ];

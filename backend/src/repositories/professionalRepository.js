@@ -4,8 +4,13 @@ export const professionalRepository = {
   list(barberId) {
     return prisma.professional.findMany({ where: { barberId }, orderBy: [{ displayOrder: "asc" }, { name: "asc" }] });
   },
+  // Publico: inclui as avaliacoes publicadas para calcular a nota media do card.
   listActive(barberId) {
-    return prisma.professional.findMany({ where: { barberId, active: true }, orderBy: [{ displayOrder: "asc" }, { name: "asc" }] });
+    return prisma.professional.findMany({
+      where: { barberId, active: true },
+      include: { reviews: { where: { published: true }, select: { rating: true } } },
+      orderBy: [{ displayOrder: "asc" }, { name: "asc" }]
+    });
   },
   findById(id, barberId) {
     return prisma.professional.findFirst({ where: { id, barberId } });

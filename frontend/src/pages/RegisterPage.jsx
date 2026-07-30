@@ -9,7 +9,7 @@ import { usePageMeta } from "../hooks/usePageMeta.js";
 export function RegisterPage() {
   usePageMeta({
     title: "Criar conta",
-    description: "Cadastre-se na Barbearia Prime para acompanhar agendamentos, historico e fidelidade."
+    description: "Cadastre-se na Barbearia Prime para agendar mais rapido e acompanhar seu historico."
   });
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ export function RegisterPage() {
   return (
     <AuthLayout
       title="Criar conta"
-      subtitle="Cadastre-se para acompanhar seus agendamentos e fidelidade."
+      subtitle="Cadastre-se para agendar mais rapido e acompanhar seu historico."
       footer={
         <>
           Ja tem conta? <Link to="/login" className="font-semibold text-gold hover:underline">Entrar</Link>

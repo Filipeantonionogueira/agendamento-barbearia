@@ -1,38 +1,24 @@
 import multer from "multer";
-import crypto from "node:crypto";
 import path from "node:path";
-import fs from "node:fs";
 import { AppError } from "../utils/AppError.js";
+import { UPLOAD_DIR } from "../services/storageService.js";
 
-export const UPLOAD_DIR = path.resolve("uploads");
-
-// Garante o diretorio de uploads na inicializacao.
-fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+export { UPLOAD_DIR };
 
 // Somente imagens: mimetype E extensao precisam bater com a allowlist.
-const ALLOWED = new Map([
-  ["image/jpeg", ".jpg"],
-  ["image/png", ".png"],
-  ["image/webp", ".webp"]
-]);
+const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
+const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"];
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
-  filename: (_req, file, cb) => {
-    // Nome sempre gerado: o nome enviado pelo usuario nunca toca o disco
-    // (evita path traversal e sobrescrita de arquivos).
-    const extension = ALLOWED.get(file.mimetype) || ".bin";
-    cb(null, `${Date.now()}-${crypto.randomBytes(12).toString("hex")}${extension}`);
-  }
-});
+// Memoria, nao disco: o arquivo segue direto para o storage (Cloudinary) sem
+// depender do sistema de arquivos do container, que e efemero em producao.
+const storage = multer.memoryStorage();
 
 function fileFilter(_req, file, cb) {
-  if (!ALLOWED.has(file.mimetype)) {
+  if (!ALLOWED_MIME.has(file.mimetype)) {
     return cb(new AppError("Formato invalido. Envie uma imagem JPG, PNG ou WEBP.", 400));
   }
   const extension = path.extname(file.originalname).toLowerCase();
-  const allowedExtensions = [".jpg", ".jpeg", ".png", ".webp"];
-  if (!allowedExtensions.includes(extension)) {
+  if (!ALLOWED_EXTENSIONS.includes(extension)) {
     return cb(new AppError("Extensao de arquivo nao permitida.", 400));
   }
   cb(null, true);

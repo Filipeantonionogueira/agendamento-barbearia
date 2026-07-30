@@ -5,7 +5,8 @@ import { authService } from "./authService.js";
 const schema = z.object({
   shopName: z.string().trim().min(2).max(80).optional(),
   whatsappNumber: z.string().trim().min(10).max(20).optional(),
-  heroImageUrl: z.string().trim().url().max(400).optional().nullable(),
+  // Aceita URL absoluta (Cloudinary) ou caminho relativo (/uploads em dev).
+  heroImageUrl: z.string().trim().max(600).optional().nullable(),
   aboutText: z.string().trim().max(1000).optional().nullable(),
   addressLine: z.string().trim().max(200).optional().nullable(),
   openingHoursText: z.string().trim().max(200).optional().nullable(),

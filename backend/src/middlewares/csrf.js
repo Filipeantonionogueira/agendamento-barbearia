@@ -14,8 +14,9 @@ function originAllowed(value) {
   }
 }
 
-// Defense in Depth contra CSRF: em mutacoes com cookie, exige Origin/Referer confiavel.
-// Complementa SameSite=lax dos cookies e o CORS com allowlist.
+// Protecao CSRF: em mutacoes com cookie, exige Origin/Referer confiavel.
+// Em producao o cookie e SameSite=None (frontend e API em dominios diferentes),
+// portanto esta verificacao — junto do CORS com allowlist — e a defesa principal.
 export function csrfGuard(req, _res, next) {
   if (!MUTATING.has(req.method)) return next();
 

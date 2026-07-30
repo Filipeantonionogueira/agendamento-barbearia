@@ -9,11 +9,13 @@ const ACTION_LABEL = {
   LOGIN_FAILED: "Login falhou",
   USER_REGISTERED: "Novo cadastro",
   APPOINTMENT_STATUS_CHANGED: "Status de agendamento",
-  COUPON_CREATED: "Cupom criado",
-  COUPON_DELETED: "Cupom excluido",
   CLIENT_BLOCK_CHANGED: "Bloqueio de cliente",
   REVIEW_REPLIED: "Resposta a avaliacao",
-  CONFIG_UPDATED: "Configuracoes alteradas"
+  CONFIG_UPDATED: "Configuracoes alteradas",
+  SITE_CONTENT_UPDATED: "Landing page editada",
+  GALLERY_ITEM_CREATED: "Item da galeria criado",
+  GALLERY_ITEM_DELETED: "Item da galeria excluido",
+  FILE_UPLOADED: "Arquivo enviado"
 };
 
 export function Auditoria() {

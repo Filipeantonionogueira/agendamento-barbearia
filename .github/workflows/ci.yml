@@ -37,6 +37,8 @@ jobs:
 
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/barbearia_test?schema=public
+      # Conexao direta usada pelas migracoes (no Supabase e diferente da URL do pooler).
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/barbearia_test?schema=public
       # Segredos descartaveis apenas para a suite de testes.
       JWT_ACCESS_SECRET: ci-access-secret-com-mais-de-32-caracteres-000000
       JWT_REFRESH_SECRET: ci-refresh-secret-com-mais-de-32-caracteres-00000

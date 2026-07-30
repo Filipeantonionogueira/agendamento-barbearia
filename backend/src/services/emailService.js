@@ -29,7 +29,7 @@ export const emailTemplates = {
       html: layout({
         title: "Bem-vindo",
         body: `<h1 style="font-size:20px;margin:0 0 12px">Ola, ${name}!</h1>
-          <p style="line-height:1.6;color:#374151">Sua conta foi criada com sucesso. Agora voce pode agendar mais rapido, acompanhar seu historico e acumular pontos de fidelidade.</p>`
+          <p style="line-height:1.6;color:#374151">Sua conta foi criada com sucesso. Agora voce pode agendar mais rapido, acompanhar seu historico e avaliar seus atendimentos.</p>`
       })
     };
   },

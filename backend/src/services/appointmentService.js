@@ -7,8 +7,6 @@ import { barberRepository } from "../repositories/barberRepository.js";
 import { blockRepository } from "../repositories/blockRepository.js";
 import { serviceRepository } from "../repositories/serviceRepository.js";
 import { professionalService } from "./professionalService.js";
-import { loyaltyService } from "./loyaltyService.js";
-import { couponService } from "./couponService.js";
 import { notificationService } from "./notificationService.js";
 import { waitlistService } from "./waitlistService.js";
 import { emailService, emailTemplates } from "./emailService.js";
@@ -23,8 +21,7 @@ const createSchema = z.object({
   time: z.string().regex(/^\d{2}:\d{2}$/),
   serviceIds: z.array(z.string().uuid()).min(1),
   professionalId: z.string().uuid(),
-  notes: z.string().trim().max(500).optional().nullable(),
-  couponCode: z.string().trim().max(30).optional().nullable()
+  notes: z.string().trim().max(500).optional().nullable()
 });
 
 const cancelSchema = z.object({ reason: z.string().trim().max(300).optional().nullable() });
@@ -87,13 +84,6 @@ export const appointmentService = {
     const totalMinutes = services.reduce((sum, service) => sum + service.estimatedMinutes, 0);
     const totalPriceCents = services.reduce((sum, service) => sum + service.priceCents, 0);
 
-    // Cupom (opcional): valida e calcula o desconto sobre o total dos servicos.
-    let couponData = null;
-    if (data.couponCode) {
-      const { coupon, discountCents } = await couponService.validateForTotal(data.couponCode, totalPriceCents);
-      couponData = { coupon, discountCents };
-    }
-
     const { startAt, endAt } = await assertSlotIsBookable({
       professionalId: professional.id,
       dateString: data.date,
@@ -128,19 +118,6 @@ export const appointmentService = {
       } else {
         client = await tx.client.create({ data: { name: data.clientName, phone: data.phone || null } });
       }
-      // Reserva o uso do cupom de forma atomica (evita ultrapassar maxUses em concorrencia).
-      if (couponData) {
-        const guard = await tx.coupon.updateMany({
-          where: {
-            id: couponData.coupon.id,
-            active: true,
-            ...(couponData.coupon.maxUses != null ? { usedCount: { lt: couponData.coupon.maxUses } } : {})
-          },
-          data: { usedCount: { increment: 1 } }
-        });
-        if (!guard.count) throw new AppError("Cupom esgotado.", 409);
-      }
-
       const appointment = await tx.appointment.create({
         data: {
           barberId,
@@ -150,8 +127,6 @@ export const appointmentService = {
           endAt,
           totalMinutes,
           totalPriceCents,
-          discountCents: couponData?.discountCents || 0,
-          couponId: couponData?.coupon.id || null,
           notes: data.notes || null,
           appointmentServices: {
             create: services.map((service) => ({
@@ -163,17 +138,6 @@ export const appointmentService = {
         },
         include: { client: true, professional: true, appointmentServices: { include: { service: true } }, barber: true }
       });
-
-      if (couponData) {
-        await tx.couponUsage.create({
-          data: {
-            couponId: couponData.coupon.id,
-            appointmentId: appointment.id,
-            userId: authUser?.sub || null,
-            discountCents: couponData.discountCents
-          }
-        });
-      }
 
       logger.info("appointment_created", { appointmentId: appointment.id, client: client.name });
       return appointment;
@@ -291,19 +255,12 @@ export const appointmentService = {
     await this.emitStatusEvents(appointment, parsed).catch(() => {});
     return appointment;
   },
-  // Eventos automaticos por mudanca de status (notificacao/e-mail/fidelidade/lista de espera).
+  // Eventos automaticos por mudanca de status (notificacao/e-mail/lista de espera).
   async emitStatusEvents(appointment, status) {
     const userId = appointment.client?.userId;
     const serviceNames = (appointment.appointmentServices || []).map((item) => item.service.name).join(" + ");
     if (status === "CONCLUIDO") {
-      await loyaltyService.awardForAppointment(appointment).catch(() => {});
       if (userId) {
-        await notificationService.notify(userId, {
-          category: "FIDELIDADE",
-          title: "Voce ganhou pontos!",
-          body: `Seu atendimento de ${serviceNames} foi concluido e rendeu pontos de fidelidade.`,
-          link: "/conta/fidelidade"
-        });
         await notificationService.notify(userId, {
           category: "AVALIACAO",
           title: "Avalie seu atendimento",

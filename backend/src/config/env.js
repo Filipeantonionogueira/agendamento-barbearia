@@ -37,6 +37,24 @@ if (isProduction && !process.env.DATABASE_URL) {
   throw new Error("[SEGURANCA] DATABASE_URL e obrigatorio em producao.");
 }
 
+// Storage de imagens. Com as credenciais do Cloudinary, os uploads vao para a nuvem;
+// sem elas, caem no disco local (util apenas em desenvolvimento).
+const cloudinary = {
+  cloudName: process.env.CLOUDINARY_CLOUD_NAME || "",
+  apiKey: process.env.CLOUDINARY_API_KEY || "",
+  apiSecret: process.env.CLOUDINARY_API_SECRET || "",
+  folder: process.env.CLOUDINARY_FOLDER || "barbearia"
+};
+cloudinary.enabled = Boolean(cloudinary.cloudName && cloudinary.apiKey && cloudinary.apiSecret);
+
+// Plataformas efemeras (Railway, Render, Fly) nao preservam o disco entre deploys:
+// sem storage externo, as imagens enviadas seriam perdidas.
+if (isProduction && !cloudinary.enabled) {
+  console.warn(
+    "[ATENCAO] Cloudinary nao configurado. Uploads irao para o disco do container e serao perdidos no proximo deploy."
+  );
+}
+
 export const env = {
   nodeEnv,
   isProduction,
@@ -55,6 +73,7 @@ export const env = {
   // Antecedencia minima para agendar (evita reserva "para daqui a 2 minutos").
   minimumBookingNoticeMinutes: Number(process.env.MINIMUM_BOOKING_NOTICE_MINUTES || 15),
   passwordResetExpiresMinutes: Number(process.env.PASSWORD_RESET_EXPIRES_MINUTES || 30),
+  cloudinary,
   emailTransport: process.env.EMAIL_TRANSPORT || "log",
   emailFrom: process.env.EMAIL_FROM || "Barbearia Prime <no-reply@barbearia.local>",
   googleClientId: process.env.GOOGLE_CLIENT_ID || "",

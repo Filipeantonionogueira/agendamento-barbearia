@@ -35,7 +35,7 @@ export const dashboardService = {
     const serviceRanking = {};
     let revenueCents = 0;
     for (const appointment of completed) {
-      const net = appointment.totalPriceCents - (appointment.discountCents || 0);
+      const net = appointment.totalPriceCents;
       revenueCents += net;
       const key = appointment.startAt.toISOString().slice(0, 10);
       revenueByDay[key] = (revenueByDay[key] || 0) + net;

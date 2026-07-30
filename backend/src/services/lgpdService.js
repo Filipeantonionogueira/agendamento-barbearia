@@ -10,7 +10,6 @@ export const lgpdService = {
       include: {
         roles: true,
         favorites: { include: { service: true, professional: true } },
-        loyaltyEntries: true,
         reviews: true,
         notifications: true,
         waitlist: true,
@@ -38,11 +37,9 @@ export const lgpdService = {
         profissional: a.professional?.name,
         servicos: a.appointmentServices.map((s) => s.service.name),
         valorCentavos: a.totalPriceCents,
-        descontoCentavos: a.discountCents,
         observacoes: a.notes
       })),
       avaliacoes: user.reviews.map((r) => ({ nota: r.rating, comentario: r.comment, resposta: r.reply, data: r.createdAt })),
-      fidelidade: user.loyaltyEntries.map((e) => ({ pontos: e.points, motivo: e.reason, data: e.createdAt })),
       favoritos: user.favorites.map((f) => ({ servico: f.service?.name, profissional: f.professional?.name })),
       notificacoes: user.notifications.map((n) => ({ titulo: n.title, corpo: n.body, data: n.createdAt })),
       listaDeEspera: user.waitlist.map((w) => ({ data: w.date, status: w.status }))

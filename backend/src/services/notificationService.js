@@ -1,7 +1,7 @@
 import { prisma } from "../config/prisma.js";
 import { AppError } from "../utils/AppError.js";
 
-export const NOTIFICATION_CATEGORIES = ["AGENDAMENTO", "CANCELAMENTO", "PROMOCAO", "FIDELIDADE", "AVALIACAO", "SISTEMA"];
+export const NOTIFICATION_CATEGORIES = ["AGENDAMENTO", "CANCELAMENTO", "FIDELIDADE", "AVALIACAO", "SISTEMA"];
 
 export const notificationService = {
   // Cria uma notificacao. Nunca lanca erro para nao quebrar o fluxo que a dispara.

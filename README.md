@@ -1,15 +1,19 @@
 # Barbearia Prime — Plataforma de Agendamento
 
-Plataforma SaaS de gestão para barbearia: site institucional, agendamento online, área do cliente
-(fidelidade, histórico, avaliações) e painel administrativo.
+Plataforma SaaS de gestão para barbearia: landing page editável pelo próprio dono, agendamento
+online, área do cliente (histórico, avaliações, favoritos) e painel administrativo.
+
+Sem qualquer funcionalidade comercial de desconto: preços são cadastrados pelo administrador e
+qualquer negociação acontece presencialmente.
 
 ## Stack
 
 | Camada | Tecnologia |
 |---|---|
-| Frontend | React 18, Vite 5, React Router 6, Tailwind CSS |
+| Frontend | React 18, Vite, React Router 6, Tailwind CSS, Framer Motion |
 | Backend | Node.js 20, Express 4, Prisma ORM |
-| Banco | PostgreSQL 16 |
+| Banco | PostgreSQL 16 (Supabase em produção) |
+| Imagens | Cloudinary (CDN) com fallback local em desenvolvimento |
 | Auth | JWT em cookie httpOnly + refresh token, bcrypt (custo 12), RBAC multi-role |
 | Testes | Vitest |
 | CI | GitHub Actions |
@@ -27,9 +31,9 @@ frontend/
       admin/        abas do painel administrativo
       landing/      seções do site institucional
       layout/       Shell, AdminShell
-    context/        AuthProvider (sessão)
-    hooks/          useFavorites, usePageMeta
-    lib/            api.js (fetch), format.js
+    context/        AuthProvider (sessão), ThemeProvider (claro/escuro)
+    hooks/          useFavorites, usePageMeta, useTrackVisit
+    lib/            api.js (fetch + upload), format.js
   public/           robots.txt, sitemap.xml
 
 backend/
@@ -40,7 +44,7 @@ backend/
     repositories/   acesso a dados (Prisma)
     middlewares/    auth, csrf, rateLimit, requestContext, errorHandler
     utils/          time, slots (puros), logger, AppError
-    config/         env, prisma, loyalty
+    config/         env, prisma
   prisma/           schema + migrations
 ```
 
@@ -53,6 +57,11 @@ backend/
 - **Lógica pura extraída** (`utils/slots.js`): cálculo de horários testável sem banco.
 - **Soft delete/anonimização** para LGPD: histórico de negócio preservado sem dados pessoais.
 - **Code splitting por rota**: painel admin não pesa no carregamento do visitante.
+- **CMS em JSON versionado** (`SiteContent`): o dono edita textos, hero, FAQ, Instagram e a ordem
+  das seções sem migração de banco a cada campo novo.
+- **Tokens de tema em CSS vars**: a mesma classe Tailwind atende os modos claro e escuro.
+- **Storage abstraído** (`storageService`): Cloudinary em produção, disco local em desenvolvimento —
+  o mesmo código roda nos dois ambientes.
 
 ## Pré-requisitos
 
@@ -94,7 +103,8 @@ fracos ou com menos de 32 caracteres (fail secure).
 
 | Variável | Obrigatória | Descrição |
 |---|---|---|
-| `DATABASE_URL` | sim (prod) | String de conexão do PostgreSQL |
+| `DATABASE_URL` | sim (prod) | Conexão do PostgreSQL (no Supabase, o pooler na porta 6543) |
+| `DIRECT_URL` | sim | Conexão direta usada pelas migrações (porta 5432) |
 | `JWT_ACCESS_SECRET` | sim (prod) | Segredo do access token (≥32 chars) |
 | `JWT_REFRESH_SECRET` | sim (prod) | Segredo do refresh token (≥32 chars) |
 | `JWT_ACCESS_EXPIRES_IN` | não | Padrão `15m` |
@@ -107,13 +117,18 @@ fracos ou com menos de 32 caracteres (fail secure).
 | `PASSWORD_RESET_EXPIRES_MINUTES` | não | Validade do token de reset (padrão 30) |
 | `EMAIL_TRANSPORT` | não | `log` (dev) — trocar por provedor real |
 | `EMAIL_FROM` | não | Remetente dos e-mails |
+| `CLOUDINARY_CLOUD_NAME` | sim (prod) | Storage das imagens enviadas |
+| `CLOUDINARY_API_KEY` | sim (prod) | Chave da API do Cloudinary |
+| `CLOUDINARY_API_SECRET` | sim (prod) | Segredo da API do Cloudinary |
+| `CLOUDINARY_FOLDER` | não | Pasta no Cloudinary (padrão `barbearia`) |
+| `TIMEZONE` | não | Fuso da barbearia (padrão `America/Sao_Paulo`) |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | não | Preparado para OAuth futuro |
 
 Frontend: `VITE_API_URL` (ex.: `http://localhost:3333/api`).
 
 ## Scripts
 
-**Backend:** `dev`, `start`, `test`, `test:watch`, `db:start`, `seed`, `prisma:generate`, `prisma:migrate`
+**Backend:** `dev`, `start`, `start:prod`, `test`, `test:watch`, `db:start`, `seed`, `prisma:generate`, `prisma:migrate`, `prisma:deploy`
 **Frontend:** `dev`, `build`, `preview`
 
 ## Testes
@@ -123,11 +138,12 @@ cd backend && npm test
 ```
 
 Cobrem a lógica crítica de negócio: cálculo de horários disponíveis (conflitos, bloqueios, janela de
-funcionamento), níveis e pontos de fidelidade, utilitários de tempo e a guarda CSRF.
+funcionamento), utilitários de tempo, a guarda CSRF e as rotas principais da API (integração).
 
 ## Segurança
 
-- **Autenticação**: JWT em cookie `httpOnly` + `SameSite=lax` + `Secure` (produção); refresh token com hash.
+- **Autenticação**: JWT em cookie `httpOnly`; `SameSite=None; Secure` em produção (frontend e API em
+  domínios diferentes) e `lax` em desenvolvimento; refresh token com hash.
 - **Autorização**: RBAC no backend em todas as rotas; nunca apenas no frontend.
 - **Headers**: CSP (`frame-ancestors 'none'`), HSTS (produção), `nosniff`, `Referrer-Policy`, `Permissions-Policy`.
 - **CSRF**: verificação de origem em mutações + CORS com allowlist.
@@ -146,6 +162,13 @@ funcionamento), níveis e pontos de fidelidade, utilitários de tempo e a guarda
 
 ## Deploy
 
+Arquitetura de produção (planos gratuitos): **Vercel** (site) + **Railway** (API) +
+**Supabase** (PostgreSQL) + **Cloudinary** (imagens).
+
+👉 O passo a passo completo está em [DEPLOY.md](DEPLOY.md).
+
+Resumo manual, para qualquer outro provedor:
+
 ```bash
 # 1. Build do frontend
 cd frontend && npm run build          # gera dist/
@@ -159,11 +182,11 @@ NODE_ENV=production npm start
 
 **Checklist de produção:**
 1. Segredos fortes definidos (o app recusa subir sem eles).
-2. `FRONTEND_ORIGIN` com o domínio real (sem curinga).
-3. HTTPS no proxy reverso + `TRUST_PROXY=true`.
-4. PostgreSQL fora de acesso público, com backup automático.
-5. Servir `frontend/dist` via CDN/Nginx com cache de assets versionados.
-6. Validação pós-deploy: `curl https://SEU_DOMINIO/api/health/ready` deve retornar `200`.
+2. `FRONTEND_ORIGIN` com o domínio real (sem curinga e sem barra no final).
+3. HTTPS nas duas pontas + `TRUST_PROXY=true` (exigido pelo cookie `SameSite=None`).
+4. `CLOUDINARY_*` configurado: o disco do container é apagado a cada deploy.
+5. PostgreSQL fora de acesso público, com backup automático.
+6. Validação pós-deploy: `curl https://SUA_API/api/health/ready` deve retornar `200`.
 
 **Rollback:** os artefatos de build são versionados por hash; para reverter, republique o `dist`
 anterior e faça `git revert` da aplicação. Migrações são aditivas — evite `DROP` em produção.

@@ -17,11 +17,10 @@ export const adminClientService = {
         client: {
           include: {
             appointments: {
-              select: { status: true, startAt: true, totalPriceCents: true, discountCents: true }
+              select: { status: true, startAt: true, totalPriceCents: true }
             }
           }
-        },
-        loyaltyEntries: { select: { points: true } }
+        }
       },
       orderBy: { createdAt: "desc" }
     });
@@ -29,7 +28,7 @@ export const adminClientService = {
     return users.map((user) => {
       const appts = user.client?.appointments || [];
       const done = appts.filter((a) => a.status === "CONCLUIDO");
-      const totalSpent = done.reduce((sum, a) => sum + (a.totalPriceCents - (a.discountCents || 0)), 0);
+      const totalSpent = done.reduce((sum, a) => sum + (a.totalPriceCents), 0);
       const lastVisit = done.map((a) => a.startAt).sort((a, b) => new Date(b) - new Date(a))[0] || null;
       return {
         id: user.id,
@@ -41,7 +40,6 @@ export const adminClientService = {
         appointmentsCount: appts.length,
         completedCount: done.length,
         totalSpentCents: totalSpent,
-        points: user.loyaltyEntries.reduce((sum, e) => sum + e.points, 0),
         lastVisit
       };
     });

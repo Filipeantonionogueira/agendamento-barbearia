@@ -1,13 +1,19 @@
 import React from "react";
-import { X, ZoomIn, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, ZoomIn, ChevronLeft, ChevronRight, Minus, Plus } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { api, assetUrl } from "../../lib/api.js";
+import { SectionHeader } from "./SectionHeader.jsx";
+import { RevealGroup, RevealItem } from "../ui/Reveal.jsx";
 
-// Galeria do site: filtro por categoria, lazy loading e lightbox com zoom e navegacao.
-export function Galeria() {
+const ZOOM_STEPS = [1, 1.6, 2.4];
+
+/** Portfolio com filtro por categoria, layout em mosaico e lightbox com zoom. */
+export function Galeria({ section }) {
+  const reduce = useReducedMotion();
   const [items, setItems] = React.useState([]);
   const [category, setCategory] = React.useState("TODAS");
   const [openIndex, setOpenIndex] = React.useState(null);
-  const [zoomed, setZoomed] = React.useState(false);
+  const [zoom, setZoom] = React.useState(0);
 
   React.useEffect(() => {
     api("/galeria").then(setItems).catch(() => setItems([]));
@@ -25,12 +31,12 @@ export function Galeria() {
 
   const close = React.useCallback(() => {
     setOpenIndex(null);
-    setZoomed(false);
+    setZoom(0);
   }, []);
 
   const go = React.useCallback(
     (step) => {
-      setZoomed(false);
+      setZoom(0);
       setOpenIndex((current) => {
         if (current === null) return current;
         const next = current + step;
@@ -45,33 +51,46 @@ export function Galeria() {
   // Acessibilidade: teclado controla o lightbox (Esc fecha, setas navegam).
   React.useEffect(() => {
     if (openIndex === null) return undefined;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     const onKey = (event) => {
       if (event.key === "Escape") close();
       if (event.key === "ArrowRight") go(1);
       if (event.key === "ArrowLeft") go(-1);
+      if (event.key === "+" || event.key === "=") setZoom((z) => Math.min(ZOOM_STEPS.length - 1, z + 1));
+      if (event.key === "-") setZoom((z) => Math.max(0, z - 1));
     };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = previous;
+      window.removeEventListener("keydown", onKey);
+    };
   }, [openIndex, close, go]);
 
   if (!items.length) return null;
   const current = openIndex !== null ? filtered[openIndex] : null;
 
   return (
-    <section className="bg-paper py-16" id="galeria">
+    <section id="galeria" className="border-y border-border bg-surface py-20 md:py-24">
       <div className="mx-auto max-w-6xl px-4">
-        <p className="text-sm uppercase tracking-[.22em] text-gold">Galeria</p>
-        <h2 className="mt-2 text-3xl font-semibold">Nosso trabalho</h2>
+        <SectionHeader
+          eyebrow="Portfolio"
+          title={section?.title || "Nosso trabalho"}
+          subtitle={section?.subtitle}
+          align="center"
+        />
 
         {categories.length > 2 && (
-          <div className="mt-6 flex flex-wrap gap-2">
+          <div className="mt-8 flex flex-wrap justify-center gap-2">
             {categories.map((item) => (
               <button
                 key={item}
                 onClick={() => setCategory(item)}
                 aria-pressed={category === item}
-                className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-                  category === item ? "bg-ink text-white" : "bg-surface text-text-secondary hover:bg-surface-subtle"
+                className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                  category === item
+                    ? "bg-brand text-brand-fg"
+                    : "border border-border text-text-secondary hover:border-gold hover:text-text-primary"
                 }`}
               >
                 {item === "TODAS" ? "Todas" : item}
@@ -80,84 +99,130 @@ export function Galeria() {
           </div>
         )}
 
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <RevealGroup key={category} className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4" stagger={0.05}>
           {filtered.map((item, index) => (
-            <button
-              key={item.id}
-              onClick={() => setOpenIndex(index)}
-              className="group relative aspect-square overflow-hidden rounded-lg bg-surface-subtle"
-              aria-label={`Ampliar imagem${item.title ? `: ${item.title}` : ""}`}
-            >
-              <img
-                src={assetUrl(item.url)}
-                alt={item.title || "Trabalho da barbearia"}
-                loading="lazy"
-                decoding="async"
-                className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-              />
-              <span className="absolute inset-0 grid place-items-center bg-ink/0 text-white opacity-0 transition group-hover:bg-ink/40 group-hover:opacity-100">
-                <ZoomIn size={22} />
-              </span>
-              {item.title && (
-                <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/80 to-transparent p-2 text-left text-xs text-white">
-                  {item.title}
+            <RevealItem key={item.id} className={index % 7 === 0 ? "col-span-2 row-span-2" : ""}>
+              <motion.button
+                onClick={() => setOpenIndex(index)}
+                whileHover={reduce ? undefined : { scale: 1.01 }}
+                className={`group relative h-full w-full overflow-hidden rounded-lg bg-surface-subtle ${
+                  index % 7 === 0 ? "aspect-square md:aspect-auto md:h-full" : "aspect-square"
+                }`}
+                aria-label={`Ampliar imagem${item.title ? `: ${item.title}` : ""}`}
+              >
+                <img
+                  src={assetUrl(item.url)}
+                  alt={item.title || "Trabalho da barbearia"}
+                  loading="lazy"
+                  decoding="async"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <span className="absolute inset-0 flex items-end bg-gradient-to-t from-ink/80 via-ink/0 to-transparent p-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                  <span className="flex w-full items-center justify-between gap-2 text-left text-xs font-medium text-white">
+                    <span className="line-clamp-1">{item.title || "Ver imagem"}</span>
+                    <ZoomIn size={16} className="shrink-0" />
+                  </span>
                 </span>
-              )}
-            </button>
+              </motion.button>
+            </RevealItem>
           ))}
-        </div>
+        </RevealGroup>
       </div>
 
-      {current && (
-        <div
-          className="fixed inset-0 z-50 grid place-items-center bg-ink/90 p-4"
-          onClick={close}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Visualizacao ampliada"
-        >
-          <button onClick={close} className="absolute right-4 top-4 rounded-lg p-2 text-white hover:bg-white/10" aria-label="Fechar">
-            <X size={24} />
-          </button>
+      <AnimatePresence>
+        {current && (
+          <motion.div
+            className="fixed inset-0 z-50 grid place-items-center bg-ink/95 p-4 backdrop-blur-sm"
+            onClick={close}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Visualizacao ampliada"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <button
+              onClick={close}
+              className="absolute right-4 top-4 rounded-md p-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+              aria-label="Fechar"
+            >
+              <X size={24} />
+            </button>
 
-          {filtered.length > 1 && (
-            <>
+            <div
+              className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 rounded-full border border-white/15 bg-white/10 p-1 backdrop-blur-md"
+              onClick={(event) => event.stopPropagation()}
+            >
               <button
-                onClick={(event) => {
-                  event.stopPropagation();
-                  go(-1);
-                }}
-                className="absolute left-2 rounded-full p-3 text-white hover:bg-white/10 sm:left-6"
-                aria-label="Imagem anterior"
+                onClick={() => setZoom((z) => Math.max(0, z - 1))}
+                disabled={zoom === 0}
+                className="grid h-9 w-9 place-items-center rounded-full text-white/80 transition-colors hover:bg-white/15 disabled:opacity-35"
+                aria-label="Reduzir zoom"
               >
-                <ChevronLeft size={28} />
+                <Minus size={16} />
               </button>
+              <span className="w-14 text-center text-xs font-semibold text-white/80">
+                {Math.round(ZOOM_STEPS[zoom] * 100)}%
+              </span>
               <button
-                onClick={(event) => {
-                  event.stopPropagation();
-                  go(1);
-                }}
-                className="absolute right-2 rounded-full p-3 text-white hover:bg-white/10 sm:right-6"
-                aria-label="Proxima imagem"
+                onClick={() => setZoom((z) => Math.min(ZOOM_STEPS.length - 1, z + 1))}
+                disabled={zoom === ZOOM_STEPS.length - 1}
+                className="grid h-9 w-9 place-items-center rounded-full text-white/80 transition-colors hover:bg-white/15 disabled:opacity-35"
+                aria-label="Aumentar zoom"
               >
-                <ChevronRight size={28} />
+                <Plus size={16} />
               </button>
-            </>
-          )}
+            </div>
 
-          <figure className="max-h-full max-w-4xl overflow-auto" onClick={(event) => event.stopPropagation()}>
-            <img
-              src={assetUrl(current.url)}
-              alt={current.title || "Trabalho da barbearia"}
-              onClick={() => setZoomed((value) => !value)}
-              className={`mx-auto rounded-lg transition-transform duration-300 ${
-                zoomed ? "max-w-none scale-150 cursor-zoom-out" : "max-h-[80vh] cursor-zoom-in"
-              }`}
-            />
-            {current.title && <figcaption className="mt-3 text-center text-sm text-white/80">{current.title}</figcaption>}
-          </figure>
-        </div>
-      )}
+            {filtered.length > 1 && (
+              <>
+                <button
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    go(-1);
+                  }}
+                  className="absolute left-2 rounded-full p-3 text-white/70 transition-colors hover:bg-white/10 hover:text-white sm:left-6"
+                  aria-label="Imagem anterior"
+                >
+                  <ChevronLeft size={30} />
+                </button>
+                <button
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    go(1);
+                  }}
+                  className="absolute right-2 rounded-full p-3 text-white/70 transition-colors hover:bg-white/10 hover:text-white sm:right-6"
+                  aria-label="Proxima imagem"
+                >
+                  <ChevronRight size={30} />
+                </button>
+              </>
+            )}
+
+            <figure
+              className="max-h-[86vh] max-w-5xl overflow-auto"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <motion.img
+                key={current.id}
+                src={assetUrl(current.url)}
+                alt={current.title || "Trabalho da barbearia"}
+                onClick={() => setZoom((z) => (z + 1) % ZOOM_STEPS.length)}
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: ZOOM_STEPS[zoom] }}
+                transition={{ duration: 0.28, ease: [0.2, 0.8, 0.2, 1] }}
+                className={`mx-auto max-h-[80vh] origin-center rounded-lg ${
+                  zoom === ZOOM_STEPS.length - 1 ? "cursor-zoom-out" : "cursor-zoom-in"
+                }`}
+              />
+              {current.title && (
+                <figcaption className="mt-4 text-center text-sm text-white/70">{current.title}</figcaption>
+              )}
+            </figure>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

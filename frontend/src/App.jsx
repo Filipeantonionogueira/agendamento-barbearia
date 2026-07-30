@@ -13,7 +13,6 @@ const ResetPasswordPage = React.lazy(() => import("./pages/ResetPasswordPage.jsx
 const ClientDashboard = React.lazy(() => import("./pages/ClientDashboard.jsx").then((m) => ({ default: m.ClientDashboard })));
 const ProfilePage = React.lazy(() => import("./pages/ProfilePage.jsx").then((m) => ({ default: m.ProfilePage })));
 const HistoryPage = React.lazy(() => import("./pages/HistoryPage.jsx").then((m) => ({ default: m.HistoryPage })));
-const LoyaltyPage = React.lazy(() => import("./pages/LoyaltyPage.jsx").then((m) => ({ default: m.LoyaltyPage })));
 const NotificationsPage = React.lazy(() => import("./pages/NotificationsPage.jsx").then((m) => ({ default: m.NotificationsPage })));
 const LoginPage = React.lazy(() => import("./pages/LoginPage.jsx").then((m) => ({ default: m.LoginPage })));
 const AdminPage = React.lazy(() => import("./pages/AdminPage.jsx").then((m) => ({ default: m.AdminPage })));
@@ -44,7 +43,6 @@ export function App() {
         <Route path="/conta" element={<RequireAuth><ClientDashboard /></RequireAuth>} />
         <Route path="/conta/perfil" element={<RequireAuth><ProfilePage /></RequireAuth>} />
         <Route path="/conta/historico" element={<RequireAuth><HistoryPage /></RequireAuth>} />
-        <Route path="/conta/fidelidade" element={<RequireAuth><LoyaltyPage /></RequireAuth>} />
         <Route path="/conta/notificacoes" element={<RequireAuth><NotificationsPage /></RequireAuth>} />
         <Route path="/admin/login" element={<LoginPage />} />
         <Route path="/admin" element={<RequireStaff><AdminPage /></RequireStaff>} />
