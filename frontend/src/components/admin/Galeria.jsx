@@ -58,7 +58,7 @@ export function GaleriaAdmin() {
             value={category}
             onChange={(e) => setCategory(e.target.value.toUpperCase())}
           />
-          <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-ink px-4 py-2 font-semibold text-white">
+          <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2 font-semibold text-brand-fg transition hover:opacity-90">
             <Upload size={16} />
             {busy ? "Enviando..." : "Enviar foto"}
             <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleFile} disabled={busy} />

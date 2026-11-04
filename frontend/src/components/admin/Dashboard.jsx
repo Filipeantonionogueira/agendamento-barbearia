@@ -36,7 +36,7 @@ export function Dashboard() {
               key={value}
               onClick={() => setPeriod(value)}
               className={`rounded-md px-4 py-2 text-sm font-semibold transition ${
-                period === value ? "bg-ink text-white shadow-sm" : "text-text-secondary hover:bg-surface"
+                period === value ? "bg-brand text-brand-fg shadow-xs" : "text-text-secondary hover:bg-surface hover:text-text-primary"
               }`}
             >
               {label}
@@ -89,7 +89,7 @@ export function Dashboard() {
                   <h3 className="text-lg font-semibold">Receita por dia</h3>
                   <p className="text-sm text-text-secondary">Comparativo dos agendamentos concluidos</p>
                 </div>
-                <span className="rounded-md bg-gold-100 px-3 py-1 text-sm font-semibold text-gold-600">Total {money(data.revenueCents)}</span>
+                <span className="rounded-md bg-gold/15 px-3 py-1 text-sm font-semibold text-gold-600 dark:text-gold-400">Total {money(data.revenueCents)}</span>
               </div>
 
               {data.revenueByDay.length ? (

@@ -64,14 +64,14 @@ export function NotificationsPage() {
             return (
               <div
                 key={item.id}
-                className={`flex items-start gap-3 rounded-lg border p-4 ${item.read ? "border-border bg-surface" : "border-gold bg-gold-100"}`}
+                className={`flex items-start gap-3 rounded-lg border p-4 ${item.read ? "border-border bg-surface" : "border-gold/50 bg-gold/10"}`}
               >
                 <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ink text-gold">
                   <Icon size={16} />
                 </span>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <strong>{item.title}</strong>
+                    <strong className="text-text-primary">{item.title}</strong>
                     {!item.read && <span className="h-2 w-2 rounded-full bg-gold" />}
                   </div>
                   {item.body && <p className="mt-1 text-sm text-text-secondary">{item.body}</p>}
@@ -82,11 +82,11 @@ export function NotificationsPage() {
                 </div>
                 <div className="flex shrink-0 gap-1">
                   {!item.read && (
-                    <button onClick={() => markRead(item.id)} className="rounded p-1 text-text-muted hover:text-ink" title="Marcar como lida">
+                    <button onClick={() => markRead(item.id)} className="rounded p-1 text-text-muted hover:text-text-primary" title="Marcar como lida">
                       <Check size={16} />
                     </button>
                   )}
-                  <button onClick={() => archive(item.id)} className="rounded p-1 text-text-muted hover:text-ink" title="Arquivar">
+                  <button onClick={() => archive(item.id)} className="rounded p-1 text-text-muted hover:text-text-primary" title="Arquivar">
                     <Archive size={16} />
                   </button>
                 </div>

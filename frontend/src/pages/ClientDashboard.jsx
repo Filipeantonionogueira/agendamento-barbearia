@@ -10,7 +10,7 @@ import { useFavorites } from "../hooks/useFavorites.js";
 import { api } from "../lib/api.js";
 import { money } from "../lib/format.js";
 import { usePageMeta } from "../hooks/usePageMeta.js";
-import { serviceNames, STATUS_VARIANT } from "../lib/appointment.js";
+import { serviceNames, STATUS_VARIANT, STATUS_LABEL } from "../lib/appointment.js";
 
 function greeting() {
   const h = new Date().getHours();
@@ -59,7 +59,7 @@ export function ClientDashboard() {
               <p className="mt-1 text-sm text-text-secondary">
                 {new Date(next.startAt).toLocaleString("pt-BR")} · {next.professional?.name}
               </p>
-              <div className="mt-2"><Badge variant={STATUS_VARIANT[next.status]}>{next.status}</Badge></div>
+              <div className="mt-2"><Badge variant={STATUS_VARIANT[next.status]}>{STATUS_LABEL[next.status] || next.status}</Badge></div>
             </div>
           ) : (
             <p className="mt-3 text-sm text-text-secondary">Voce nao tem agendamentos futuros.</p>
@@ -133,7 +133,7 @@ export function ClientDashboard() {
                     {new Date(a.startAt).toLocaleString("pt-BR")} · {a.professional?.name}
                   </p>
                 </div>
-                <Badge variant={STATUS_VARIANT[a.status]}>{a.status}</Badge>
+                <Badge variant={STATUS_VARIANT[a.status]}>{STATUS_LABEL[a.status] || a.status}</Badge>
               </div>
             ))}
           </div>

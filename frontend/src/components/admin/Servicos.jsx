@@ -43,7 +43,7 @@ export function Servicos() {
           <label className="mb-3 block text-sm">
             <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} /> Ativo
           </label>
-          <button className="rounded-lg bg-ink px-4 py-2 font-semibold text-white" onClick={save}>
+          <button className="rounded-lg bg-brand px-4 py-2 font-semibold text-brand-fg transition hover:opacity-90" onClick={save}>
             Salvar
           </button>
         </div>

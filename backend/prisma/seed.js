@@ -17,11 +17,15 @@ const services = [
 async function main() {
   const barber = await prisma.barber.upsert({
     where: { id: "00000000-0000-0000-0000-000000000001" },
-    update: {},
+    update: {
+      shopName: "Lukaobarber7"
+    },
     create: {
       id: "00000000-0000-0000-0000-000000000001",
-      shopName: "Barbearia Prime",
-      whatsappNumber: "5511999999999"
+      shopName: "Lukaobarber7",
+      whatsappNumber: "5511999999999",
+      aboutText: "Na Lukaobarber7, combinamos tecnicas classicas de barbearia com as tendencias mais modernas do visual masculino. Ambiente climatizado, toalha quente, navalha afiada e profissionais dedicados a elevar sua autoestima.",
+      heroImageUrl: "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=1200&q=80"
     }
   });
 

@@ -41,6 +41,12 @@ export function AuthProvider({ children }) {
     return data.user;
   };
 
+  const loginWithGoogle = async (credential) => {
+    const data = await api("/auth/google", { method: "POST", body: JSON.stringify({ credential }) });
+    setUser(data.user);
+    return data.user;
+  };
+
   const logout = async () => {
     await api("/auth/logout", { method: "POST" }).catch(() => {});
     setUser(null);
@@ -54,7 +60,7 @@ export function AuthProvider({ children }) {
 
   const hasRole = (...roles) => !!user && roles.some((role) => user.roles.includes(role));
 
-  const value = { user, loading, login, register, logout, updateProfile, reload: loadUser, hasRole };
+  const value = { user, loading, login, register, loginWithGoogle, logout, updateProfile, reload: loadUser, hasRole };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

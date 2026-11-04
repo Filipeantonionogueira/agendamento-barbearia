@@ -1,4 +1,4 @@
-# Barbearia Prime — Plataforma de Agendamento
+# Lukaobarber7 — Plataforma de Agendamento
 
 Plataforma SaaS de gestão para barbearia: landing page editável pelo próprio dono, agendamento
 online, área do cliente (histórico, avaliações, favoritos) e painel administrativo.

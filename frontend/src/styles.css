@@ -111,6 +111,11 @@ body {
     @apply cursor-not-allowed opacity-60;
   }
 
+  select.field option {
+    background-color: rgb(var(--surface));
+    color: rgb(var(--text-primary));
+  }
+
   .slot {
     @apply min-h-[46px] rounded-md border border-border-strong bg-surface text-sm font-semibold text-text-primary transition-all hover:border-gold hover:text-gold;
   }

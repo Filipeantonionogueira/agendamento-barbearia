@@ -9,7 +9,7 @@ function layout({ title, body }) {
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:24px 0">
     <tr><td align="center">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 16px 48px rgba(21,21,21,.08)">
-        <tr><td style="background:#151515;padding:20px 28px;color:#c79a3b;font-size:18px;font-weight:bold">Barbearia Prime</td></tr>
+        <tr><td style="background:#151515;padding:20px 28px;color:#c79a3b;font-size:18px;font-weight:bold">Lukaobarber7</td></tr>
         <tr><td style="padding:28px">${body}</td></tr>
         <tr><td style="padding:18px 28px;background:#faf9f6;color:#6b7280;font-size:12px">Este e-mail foi enviado automaticamente. Em caso de duvida, fale com a barbearia.</td></tr>
       </table>
@@ -25,7 +25,7 @@ function button(href, label) {
 export const emailTemplates = {
   welcome({ name }) {
     return {
-      subject: "Bem-vindo a Barbearia Prime",
+      subject: "Bem-vindo a Lukaobarber7",
       html: layout({
         title: "Bem-vindo",
         body: `<h1 style="font-size:20px;margin:0 0 12px">Ola, ${name}!</h1>

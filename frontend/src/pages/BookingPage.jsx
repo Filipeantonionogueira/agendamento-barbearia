@@ -175,7 +175,7 @@ export function BookingPage() {
       );
       window.open(`https://wa.me/${appointment.barber.whatsappNumber}?text=${text}`, "_blank");
       setMessageVariant("success");
-      setMessage("Agendamento confirmado! O WhatsApp foi aberto para avisar a barbearia.");
+      setMessage("Solicitacao de agendamento enviada! Status: Pendente. O WhatsApp foi aberto para contato com a barbearia.");
     } catch (error) {
       setMessageVariant("danger");
       setMessage(error.message);
@@ -184,7 +184,7 @@ export function BookingPage() {
     }
   }
 
-  const shopName = config?.shopName || "Barbearia Prime";
+  const shopName = config?.shopName || "Lukaobarber7";
   const bookingSection = sectionOf("agendamento");
 
   function renderStep() {
@@ -289,41 +289,44 @@ export function BookingPage() {
         />
 
         <div className="mt-12 grid gap-6 lg:grid-cols-[1.45fr_.55fr]">
-          <div className="rounded-xl border border-border bg-surface p-5 md:p-8">
+          <div className="min-w-0 rounded-xl border border-border bg-surface p-5 md:p-8">
             <StepProgress steps={STEPS} current={step} completed={completedSteps} onSelect={goTo} />
 
             {/* A troca de `key` remonta o painel: a etapa nova entra deslizando no
                 sentido da navegacao (avancar para a esquerda, voltar para a direita). */}
-            <div className="mt-8 overflow-hidden">
+            <div className="mt-8 min-w-0 overflow-hidden">
               <motion.div
                 key={`step-${step}`}
                 initial={reduceMotion ? false : { opacity: 0, x: direction * 28 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.28, ease: [0.2, 0.8, 0.2, 1] }}
+                className="min-w-0"
               >
                 {renderStep()}
               </motion.div>
             </div>
           </div>
 
-          <SummarySidebar
-            selectedServices={selectedServices}
-            professionalName={selectedProfessional?.name}
-            date={date}
-            time={time}
-            total={total}
-            totalMinutes={totalMinutes}
-            isLastStep={step === STEPS.length - 1}
-            canAdvance={stepReady[step]}
-            canGoBack={step > 0}
-            onBack={() => goTo(step - 1)}
-            onNext={() => goTo(step + 1)}
-            disabled={!stepReady.every(Boolean)}
-            onConfirm={confirm}
-            submitting={submitting}
-            message={message}
-            messageVariant={messageVariant}
-          />
+          <div className="min-w-0">
+            <SummarySidebar
+              selectedServices={selectedServices}
+              professionalName={selectedProfessional?.name}
+              date={date}
+              time={time}
+              total={total}
+              totalMinutes={totalMinutes}
+              isLastStep={step === STEPS.length - 1}
+              canAdvance={stepReady[step]}
+              canGoBack={step > 0}
+              onBack={() => goTo(step - 1)}
+              onNext={() => goTo(step + 1)}
+              disabled={!stepReady.every(Boolean)}
+              onConfirm={confirm}
+              submitting={submitting}
+              message={message}
+              messageVariant={messageVariant}
+            />
+          </div>
         </div>
       </section>
     )

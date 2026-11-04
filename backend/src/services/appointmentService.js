@@ -149,8 +149,8 @@ export const appointmentService = {
       const when = new Date(created.startAt).toLocaleString("pt-BR");
       await notificationService.notify(authUser.sub, {
         category: "AGENDAMENTO",
-        title: "Agendamento confirmado",
-        body: `${serviceNames} com ${created.professional.name} em ${when}.`,
+        title: "Solicitacao de agendamento recebida",
+        body: `${serviceNames} com ${created.professional.name} em ${when}. Aguardando confirmacao da barbearia.`,
         link: "/conta/historico"
       });
       if (authUser.email) {

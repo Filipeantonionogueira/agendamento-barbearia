@@ -1,13 +1,14 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthLayout } from "../components/auth/AuthLayout.jsx";
+import { GoogleAuthButton } from "../components/auth/GoogleAuthButton.jsx";
 import { Input } from "../components/ui/Input.jsx";
 import { Button } from "../components/ui/Button.jsx";
 import { useAuth } from "../context/AuthProvider.jsx";
 import { usePageMeta } from "../hooks/usePageMeta.js";
 
 export function ClientLoginPage() {
-  usePageMeta({ title: "Entrar", description: "Acesse sua conta da Barbearia Prime para agendar mais rapido." });
+  usePageMeta({ title: "Entrar", description: "Acesse sua conta da Lukaobarber7 para agendar mais rapido." });
   const { login, hasRole } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = React.useState("");
@@ -33,6 +34,17 @@ export function ClientLoginPage() {
     <AuthLayout
       title="Entrar"
       subtitle="Acesse sua conta para agendar mais rapido."
+      social={
+        <div>
+          <GoogleAuthButton onError={setError} />
+          <div className="relative my-5 flex items-center justify-center">
+            <div className="w-full border-t border-border" />
+            <span className="absolute bg-surface px-3 text-xs font-medium uppercase tracking-wider text-text-muted">
+              ou
+            </span>
+          </div>
+        </div>
+      }
       footer={
         <>
           Nao tem conta? <Link to="/cadastro" className="font-semibold text-gold hover:underline">Criar conta</Link>
@@ -46,7 +58,7 @@ export function ClientLoginPage() {
           Esqueci minha senha
         </Link>
         {error && <p className="text-sm text-feedback-danger">{error}</p>}
-        <Button type="submit" disabled={busy}>{busy ? "Entrando..." : "Entrar"}</Button>
+        <Button type="submit" disabled={busy}>{busy ? "Entrando..." : "Entrar com e-mail"}</Button>
       </form>
     </AuthLayout>
   );

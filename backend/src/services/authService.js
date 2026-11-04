@@ -215,5 +215,77 @@ export const authService = {
     if (password) data.passwordHash = await bcrypt.hash(z.string().min(6).parse(password), 12);
     if (!Object.keys(data).length) return owner;
     return prisma.user.update({ where: { id: owner.id }, data });
+  },
+
+  async googleLogin(input) {
+    const { credential } = z
+      .object({
+        credential: z.string({ required_error: "Credencial do Google obrigatoria." }).min(1, "Credencial do Google obrigatoria.")
+      })
+      .parse(input);
+
+    let payload;
+    try {
+      const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`);
+      if (!response.ok) {
+        throw new Error("Tokeninfo do Google retornou erro.");
+      }
+      payload = await response.json();
+    } catch (err) {
+      logger.warn("google_token_verification_failed", { error: err.message });
+      throw new AppError("Nao foi possivel validar as credenciais com o Google.", 401);
+    }
+
+    if (!payload?.sub || !payload?.email) {
+      throw new AppError("Dados de usuario incompletos no token do Google.", 401);
+    }
+
+    const emailVerified = payload.email_verified === "true" || payload.email_verified === true;
+    if (!emailVerified) {
+      throw new AppError("O e-mail da conta Google nao esta verificado.", 401);
+    }
+
+    if (env.googleClientId && payload.aud !== env.googleClientId) {
+      logger.warn("google_client_id_mismatch", { aud: payload.aud, expected: env.googleClientId });
+      throw new AppError("Token emitido para um cliente Google diferente do configurado.", 401);
+    }
+
+    const email = payload.email.toLowerCase();
+    let user = await userRepository.findByGoogleId(payload.sub);
+
+    if (!user) {
+      const existingByEmail = await userRepository.findByEmail(email);
+      if (existingByEmail) {
+        user = await userRepository.update(existingByEmail.id, {
+          googleId: payload.sub,
+          photoUrl: existingByEmail.photoUrl || payload.picture || null
+        });
+        logger.info("google_account_linked", { userId: user.id });
+      } else {
+        user = await userRepository.create(
+          {
+            barberId: barberRepository.defaultId,
+            email,
+            name: payload.name || email.split("@")[0],
+            photoUrl: payload.picture || null,
+            googleId: payload.sub,
+            authProvider: "google",
+            active: true
+          },
+          ["CLIENT"]
+        );
+        logger.info("google_user_registered", { userId: user.id });
+      }
+    }
+
+    if (!user.active) {
+      throw new AppError("Esta conta esta desativada. Entre em contato com a barbearia.", 403);
+    }
+
+    const accessToken = signAccess(user);
+    const refreshToken = signRefresh(user);
+    await issueRefreshToken(user, refreshToken);
+    logger.info("google_login_success", { userId: user.id });
+    return { accessToken, refreshToken, user: publicUser(user) };
   }
 };

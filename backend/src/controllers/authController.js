@@ -41,6 +41,17 @@ export const authController = {
       next(error);
     }
   },
+  async googleLogin(req, res, next) {
+    try {
+      const result = await authService.googleLogin(req.body);
+      setAuthCookies(res, result);
+      auditService.record({ userId: result.user.id, actorName: result.user.name, action: "GOOGLE_LOGIN", entity: "User", entityId: result.user.id, req });
+      res.json({ user: result.user });
+    } catch (error) {
+      auditService.record({ action: "GOOGLE_LOGIN_FAILED", entity: "User", metadata: { error: error.message }, req });
+      next(error);
+    }
+  },
   async refresh(req, res, next) {
     try {
       const result = await authService.refresh(req.cookies?.refreshToken);

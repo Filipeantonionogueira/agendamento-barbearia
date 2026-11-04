@@ -52,7 +52,7 @@ export function Avaliacoes() {
                   onChange={(e) => setReplyText(e.target.value)}
                 />
                 <div className="mt-2 flex gap-2">
-                  <button className="rounded-lg bg-ink px-3 py-1.5 text-sm font-semibold text-white" onClick={() => sendReply(review.id)}>Enviar</button>
+                  <button className="rounded-lg bg-brand px-3 py-1.5 text-sm font-semibold text-brand-fg transition hover:opacity-90" onClick={() => sendReply(review.id)}>Enviar</button>
                   <button className="rounded-lg border border-border px-3 py-1.5 text-sm" onClick={() => setReplyFor(null)}>Cancelar</button>
                 </div>
               </div>

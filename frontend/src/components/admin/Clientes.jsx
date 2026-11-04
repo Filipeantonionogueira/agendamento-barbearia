@@ -94,7 +94,7 @@ export function Clientes() {
                 <td className="p-3">
                   <button
                     onClick={() => toggleBlock(client)}
-                    className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${client.active ? "border border-feedback-danger text-feedback-danger" : "bg-ink text-white"}`}
+                    className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${client.active ? "border border-feedback-danger text-feedback-danger" : "bg-brand text-brand-fg"}`}
                   >
                     {client.active ? "Bloquear" : "Desbloquear"}
                   </button>

@@ -95,12 +95,12 @@ const contentSchema = z.object({
 
 // Conteudo inicial: textos neutros, sem lista de comodidades (varia por barbearia).
 export const DEFAULT_CONTENT = contentSchema.parse({
-  brand: { logoUrl: "", tagline: "Barbearia" },
+  brand: { logoUrl: "", tagline: "Lukaobarber7" },
   hero: {
-    eyebrow: "Agendamento online",
-    title: "Seu horario, sem espera.",
+    eyebrow: "Lukaobarber7",
+    title: "Corte impecavel, hora marcada.",
     subtitle: "Escolha o servico, o profissional e o melhor horario. Confirmacao na hora.",
-    backgroundUrl: "",
+    backgroundUrl: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1920&q=80",
     videoUrl: "",
     overlayOpacity: 72,
     primaryCta: { label: "Agendar agora", url: "#agendamento" },

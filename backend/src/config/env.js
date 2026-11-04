@@ -75,7 +75,7 @@ export const env = {
   passwordResetExpiresMinutes: Number(process.env.PASSWORD_RESET_EXPIRES_MINUTES || 30),
   cloudinary,
   emailTransport: process.env.EMAIL_TRANSPORT || "log",
-  emailFrom: process.env.EMAIL_FROM || "Barbearia Prime <no-reply@barbearia.local>",
+  emailFrom: process.env.EMAIL_FROM || "Lukaobarber7 <no-reply@barbearia.local>",
   googleClientId: process.env.GOOGLE_CLIENT_ID || "",
   googleClientSecret: process.env.GOOGLE_CLIENT_SECRET || ""
 };

@@ -80,7 +80,7 @@ function AccountArea({ solid, onNavigate }) {
  * Navbar dinamica: transparente sobre o hero e solida (com blur) apos rolar.
  * As ancoras so aparecem na landing, onde as secoes existem.
  */
-export function Navbar({ shopName = "Barbearia Prime", logoUrl, showAnchors = true }) {
+export function Navbar({ shopName = "Lukaobarber7", logoUrl, showAnchors = true }) {
   const [scrolled, setScrolled] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const reduce = useReducedMotion();

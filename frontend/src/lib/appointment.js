@@ -12,3 +12,11 @@ export const STATUS_VARIANT = {
   CONCLUIDO: "success",
   CANCELADO: "danger"
 };
+
+/** Rotulos exibidos na interface para os status de agendamento. */
+export const STATUS_LABEL = {
+  PENDENTE: "Pendente",
+  CONFIRMADO: "Agendado",
+  CONCLUIDO: "Concluído",
+  CANCELADO: "Cancelado"
+};

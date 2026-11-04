@@ -4,7 +4,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { assetUrl } from "../../lib/api.js";
 
 const FALLBACK_IMAGE =
-  "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=1900&q=80";
+  "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1920&q=80";
 
 /** Conta de 0 ate o numero do texto preservando prefixo/sufixo ("4.9", "+1.2k", "2min"). */
 function AnimatedStat({ value, label, delay }) {
@@ -63,9 +63,9 @@ export function Hero({ hero, shopName }) {
   const secondary = hero?.secondaryCta?.label ? hero.secondaryCta : null;
 
   return (
-    <section className="relative flex min-h-[92vh] items-center overflow-hidden">
+    <section className="relative flex min-h-[92vh] items-center overflow-hidden isolate bg-ink">
       {/* Fundo: video quando configurado, imagem caso contrario. */}
-      <div className="absolute inset-0 -z-10">
+      <div className="absolute inset-0 z-0 pointer-events-none">
         {videoUrl ? (
           <video
             className="h-full w-full object-cover"
@@ -101,7 +101,7 @@ export function Hero({ hero, shopName }) {
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-paper" />
       </div>
 
-      <div className="mx-auto w-full max-w-6xl px-4 pb-24 pt-32">
+      <div className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-24 pt-32">
         <motion.p
           initial={reduce ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}

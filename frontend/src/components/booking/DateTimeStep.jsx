@@ -44,7 +44,7 @@ export function DateTimeStep({
       description="Mostramos apenas os horarios realmente livres."
       icon={<CalendarDays size={19} />}
     >
-      <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+      <div className="no-scrollbar -mx-1 flex w-full max-w-full min-w-0 gap-2 overflow-x-auto px-1 pb-1">
         {days.map((item) => {
           const active = date === item.value;
           return (

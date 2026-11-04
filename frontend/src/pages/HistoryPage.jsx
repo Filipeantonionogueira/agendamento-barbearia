@@ -11,13 +11,13 @@ import { StarRating } from "../components/ui/StarRating.jsx";
 import { api } from "../lib/api.js";
 import { money } from "../lib/format.js";
 import { usePageMeta } from "../hooks/usePageMeta.js";
-import { serviceNames, STATUS_VARIANT } from "../lib/appointment.js";
+import { serviceNames, STATUS_VARIANT, STATUS_LABEL } from "../lib/appointment.js";
 
 const STATUS_FILTERS = [
   ["TODOS", "Todos"],
   ["PENDENTE", "Pendentes"],
-  ["CONFIRMADO", "Confirmados"],
-  ["CONCLUIDO", "Concluidos"],
+  ["CONFIRMADO", "Agendados"],
+  ["CONCLUIDO", "Concluídos"],
   ["CANCELADO", "Cancelados"]
 ];
 
@@ -70,8 +70,8 @@ export function HistoryPage() {
             <button
               key={value}
               onClick={() => setStatus(value)}
-              className={`rounded-lg px-3 py-2 text-sm transition ${
-                status === value ? "bg-ink text-white" : "bg-surface-subtle text-text-secondary hover:bg-surface"
+              className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
+                status === value ? "bg-brand text-brand-fg shadow-xs" : "bg-surface-subtle text-text-secondary hover:bg-surface hover:text-text-primary"
               }`}
             >
               {label}
@@ -100,8 +100,8 @@ export function HistoryPage() {
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <div className="flex items-center gap-2">
-                    <strong>{serviceNames(a)}</strong>
-                    <Badge variant={STATUS_VARIANT[a.status]}>{a.status}</Badge>
+                    <strong className="text-text-primary">{serviceNames(a)}</strong>
+                    <Badge variant={STATUS_VARIANT[a.status]}>{STATUS_LABEL[a.status] || a.status}</Badge>
                   </div>
                   <p className="mt-1 text-sm text-text-secondary">
                     {new Date(a.startAt).toLocaleString("pt-BR")} · {a.professional?.name} · {money(a.totalPriceCents)}

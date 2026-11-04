@@ -1,6 +1,6 @@
 import React from "react";
 
-const SITE_NAME = "Barbearia Prime";
+const SITE_NAME = "Lukaobarber7";
 
 function setMeta(attr, key, value) {
   if (!value) return;

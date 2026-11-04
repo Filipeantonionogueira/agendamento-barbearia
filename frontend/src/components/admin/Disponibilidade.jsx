@@ -77,7 +77,7 @@ export function Disponibilidade() {
           </div>
         ))}
       </div>
-      <button className="mt-4 rounded-lg bg-ink px-4 py-2 font-semibold text-white" onClick={save} disabled={!professionalId}>
+      <button className="mt-4 rounded-lg bg-brand px-4 py-2 font-semibold text-brand-fg transition hover:opacity-90 disabled:opacity-50" onClick={save} disabled={!professionalId}>
         Salvar disponibilidade
       </button>
       <div className="mt-8 rounded-lg border border-border bg-surface p-4">

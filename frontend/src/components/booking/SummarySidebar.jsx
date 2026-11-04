@@ -37,7 +37,7 @@ export function SummarySidebar({
   const dateLabel = date ? new Date(`${date}T12:00:00`).toLocaleDateString("pt-BR", { day: "2-digit", month: "long" }) : "";
 
   return (
-    <aside className="lg:sticky lg:top-24 h-fit overflow-hidden rounded-xl bg-ink text-white shadow-soft">
+    <aside className="w-full min-w-0 lg:sticky lg:top-24 h-fit overflow-hidden rounded-xl bg-ink text-white shadow-soft">
       <div className="border-b border-white/8 px-6 py-5">
         <h2 className="font-display text-xl font-semibold text-white">Resumo</h2>
         <p className="mt-1 text-xs text-white/45">Confira antes de confirmar</p>
@@ -91,7 +91,7 @@ export function SummarySidebar({
               onClick={onConfirm}
             >
               {submitting ? <Loader2 size={17} className="animate-spin" /> : <CheckCircle2 size={17} />}
-              {submitting ? "Confirmando..." : "Confirmar agendamento"}
+              {submitting ? "Enviando..." : "Solicitar agendamento"}
             </motion.button>
           ) : (
             <motion.button

@@ -5,7 +5,7 @@ import { Badge } from "../ui/Badge.jsx";
 import { EmptyState } from "../ui/EmptyState.jsx";
 import { api } from "../../lib/api.js";
 import { money } from "../../lib/format.js";
-import { serviceNames, STATUS_VARIANT } from "../../lib/appointment.js";
+import { serviceNames, STATUS_VARIANT, STATUS_LABEL } from "../../lib/appointment.js";
 import { RescheduleModal } from "./RescheduleModal.jsx";
 
 const VIEWS = [
@@ -15,7 +15,12 @@ const VIEWS = [
   ["lista", "Lista"]
 ];
 
-const STATUSES = ["PENDENTE", "CONFIRMADO", "CONCLUIDO", "CANCELADO"];
+const STATUS_OPTIONS = [
+  { value: "PENDENTE", label: "Pendente" },
+  { value: "CONFIRMADO", label: "Agendado" },
+  { value: "CONCLUIDO", label: "Concluído" },
+  { value: "CANCELADO", label: "Cancelado" }
+];
 const WEEKDAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"];
 
 const startOfDay = (date) => {
@@ -51,7 +56,7 @@ function AppointmentCard({ item, onStatusChange, onReschedule, compact = false }
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <strong className={compact ? "truncate text-sm" : ""}>{item.client?.name}</strong>
-            <Badge variant={STATUS_VARIANT[item.status]}>{item.status}</Badge>
+            <Badge variant={STATUS_VARIANT[item.status]}>{STATUS_LABEL[item.status] || item.status}</Badge>
           </div>
           <p className={`text-text-secondary ${compact ? "truncate text-xs" : "text-sm"}`}>
             {new Date(item.startAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })} ·{" "}
@@ -75,8 +80,10 @@ function AppointmentCard({ item, onStatusChange, onReschedule, compact = false }
             onChange={(event) => onStatusChange(item.id, event.target.value)}
             aria-label={`Status do agendamento de ${item.client?.name}`}
           >
-            {STATUSES.map((status) => (
-              <option key={status}>{status}</option>
+            {STATUS_OPTIONS.map((status) => (
+              <option key={status.value} value={status.value}>
+                {status.label}
+              </option>
             ))}
           </select>
         </div>
@@ -169,14 +176,14 @@ export function Agenda() {
           )}
           <strong className="ml-1 capitalize">{periodLabel()}</strong>
         </div>
-        <div className="flex rounded-lg bg-surface-subtle p-1">
+        <div className="flex overflow-x-auto no-scrollbar rounded-lg bg-surface-subtle p-1">
           {VIEWS.map(([value, label]) => (
             <button
               key={value}
               onClick={() => setView(value)}
               aria-pressed={view === value}
               className={`rounded-md px-3 py-2 text-sm font-semibold transition ${
-                view === value ? "bg-ink text-white shadow-sm" : "text-text-secondary hover:bg-surface"
+                view === value ? "bg-brand text-brand-fg shadow-xs" : "text-text-secondary hover:bg-surface hover:text-text-primary"
               }`}
             >
               {label}
@@ -198,7 +205,7 @@ export function Agenda() {
       ) : view === "semana" ? (
         <div className="grid gap-3 md:grid-cols-7">
           {weekDays.map((day) => (
-            <div key={day.toISOString()} className={`rounded-lg border p-2 ${sameDay(day, new Date()) ? "border-gold bg-gold-100" : "border-border bg-surface"}`}>
+            <div key={day.toISOString()} className={`rounded-lg border p-2 ${sameDay(day, new Date()) ? "border-gold/60 bg-gold/10" : "border-border bg-surface"}`}>
               <p className="mb-2 text-center text-xs font-semibold text-text-secondary">
                 {WEEKDAYS[day.getDay()]} {day.getDate()}
               </p>
@@ -229,13 +236,13 @@ export function Agenda() {
                     setReference(day);
                     setView("dia");
                   }}
-                  className={`min-h-[76px] rounded-lg border p-1 text-left transition hover:border-gold ${
-                    sameDay(day, new Date()) ? "border-gold" : "border-border"
+                  className={`min-h-[58px] sm:min-h-[76px] rounded-lg border p-1 text-left transition hover:border-gold ${
+                    sameDay(day, new Date()) ? "border-gold/60 bg-gold/10" : "border-border"
                   } ${isCurrentMonth ? "bg-surface" : "bg-surface-subtle opacity-50"}`}
                 >
-                  <span className="text-xs font-semibold">{day.getDate()}</span>
+                  <span className="text-xs font-semibold text-text-primary">{day.getDate()}</span>
                   {list.length > 0 && (
-                    <span className="mt-1 block rounded bg-ink px-1 py-0.5 text-center text-[10px] font-bold text-gold">
+                    <span className="mt-1 block rounded bg-gold/20 px-1 py-0.5 text-center text-[10px] font-bold text-gold-600 dark:text-gold-400">
                       {list.length} agend.
                     </span>
                   )}

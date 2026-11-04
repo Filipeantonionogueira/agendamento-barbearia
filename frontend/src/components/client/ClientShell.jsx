@@ -27,22 +27,22 @@ export function ClientShell({ children }) {
   }
 
   return (
-    <main className="min-h-screen bg-paper text-ink">
+    <main className="min-h-screen bg-paper text-text-primary">
       <header className="border-b border-border bg-surface">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4">
           <Link to="/" className="flex items-center gap-2">
             <span className="grid h-9 w-9 place-items-center rounded-lg bg-gold text-ink">
               <Scissors size={18} />
             </span>
-            <strong>Minha conta</strong>
+            <strong className="text-text-primary">Minha conta</strong>
           </Link>
           <nav className="flex items-center gap-1">
             {NAV.map(({ to, label, icon: Icon, badge }) => (
               <Link
                 key={to}
                 to={to}
-                className={`relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition ${
-                  location.pathname === to ? "bg-ink text-white" : "text-text-secondary hover:bg-surface-subtle"
+                className={`relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition ${
+                  location.pathname === to ? "bg-brand text-brand-fg shadow-xs" : "text-text-secondary hover:bg-surface-subtle hover:text-text-primary"
                 }`}
               >
                 <span className="relative">
@@ -56,10 +56,10 @@ export function ClientShell({ children }) {
                 <span className="hidden sm:inline">{label}</span>
               </Link>
             ))}
-            <Link to="/" className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-text-secondary hover:bg-surface-subtle">
+            <Link to="/" className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-text-secondary hover:bg-surface-subtle hover:text-text-primary">
               <CalendarPlus size={16} /> <span className="hidden sm:inline">Agendar</span>
             </Link>
-            <button onClick={handleLogout} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-text-secondary hover:bg-surface-subtle">
+            <button onClick={handleLogout} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-text-secondary hover:bg-surface-subtle hover:text-feedback-danger">
               <LogOut size={16} /> <span className="hidden sm:inline">Sair</span>
             </button>
           </nav>

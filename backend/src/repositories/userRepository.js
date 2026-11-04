@@ -6,6 +6,9 @@ export const userRepository = {
   findByEmail(email) {
     return prisma.user.findUnique({ where: { email }, include: withRoles });
   },
+  findByGoogleId(googleId) {
+    return prisma.user.findUnique({ where: { googleId }, include: withRoles });
+  },
   findById(id) {
     return prisma.user.findUnique({ where: { id }, include: withRoles });
   },

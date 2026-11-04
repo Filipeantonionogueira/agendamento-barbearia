@@ -26,7 +26,7 @@ enum Role {
 
 model Barber {
   id               String         @id @default(uuid())
-  shopName         String         @default("Barbearia Prime")
+  shopName         String         @default("Lukaobarber7")
   whatsappNumber   String         @default("5511999999999")
   heroImageUrl     String?
   aboutText        String?
