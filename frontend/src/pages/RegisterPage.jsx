@@ -62,6 +62,16 @@ export function RegisterPage() {
         <Input label="Senha" type="password" value={form.password} onChange={update("password")} required minLength={6} />
         {error && <p className="text-sm text-feedback-danger">{error}</p>}
         <Button type="submit" disabled={busy}>{busy ? "Criando..." : "Criar conta com e-mail"}</Button>
+        <p className="text-center text-xs text-text-muted">
+          Ao se cadastrar, você concorda com nossos{" "}
+          <Link to="/termos" className="underline hover:text-gold">
+            Termos de Uso
+          </Link>{" "}
+          e com a{" "}
+          <Link to="/privacidade" className="underline hover:text-gold">
+            Política de Privacidade
+          </Link>.
+        </p>
       </form>
     </AuthLayout>
   );

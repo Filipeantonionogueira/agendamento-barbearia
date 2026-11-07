@@ -1,7 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Scissors, Instagram, Facebook, Youtube, MessageCircle, MapPin, Clock } from "lucide-react";
+import { Scissors, Instagram, Facebook, Youtube, MessageCircle, MapPin, Clock, ShieldCheck, Cookie } from "lucide-react";
 import { assetUrl } from "../../lib/api.js";
+import { useConsent } from "../../context/ConsentContext.jsx";
 
 const SOCIAL_ICONS = {
   instagram: Instagram,
@@ -22,6 +23,7 @@ const LINKS = [
 export function Footer({ shopName, whatsappNumber, addressLine, openingHoursText, socials = {}, footer = {}, logoUrl }) {
   const year = new Date().getFullYear();
   const socialEntries = Object.entries(socials).filter(([, url]) => url);
+  const { openPreferences } = useConsent();
 
   return (
     <footer className="border-t border-border bg-ink text-white/70">
@@ -106,11 +108,27 @@ export function Footer({ shopName, whatsappNumber, addressLine, openingHoursText
       </div>
 
       <div className="border-t border-white/8">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-white/35 sm:flex-row">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-5 text-xs text-white/45 sm:flex-row">
           <p>
             © {year} {shopName}. {footer.legal || "Todos os direitos reservados."}
           </p>
-          <p>Agendamento online</p>
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs">
+            <Link to="/privacidade" className="transition-colors hover:text-gold hover:underline">
+              Privacidade (LGPD)
+            </Link>
+            <span>•</span>
+            <Link to="/termos" className="transition-colors hover:text-gold hover:underline">
+              Termos de Uso
+            </Link>
+            <span>•</span>
+            <button
+              type="button"
+              onClick={openPreferences}
+              className="inline-flex items-center gap-1.5 transition-colors hover:text-gold cursor-pointer"
+            >
+              <Cookie size={13} /> Preferências de Cookies
+            </button>
+          </div>
         </div>
       </div>
     </footer>

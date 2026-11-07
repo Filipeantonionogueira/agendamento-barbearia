@@ -67,7 +67,7 @@ app.use(
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type"]
+    allowedHeaders: ["Content-Type", "Accept", "X-Requested-With", "Origin"]
   })
 );
 app.use(express.json({ limit: "100kb" }));

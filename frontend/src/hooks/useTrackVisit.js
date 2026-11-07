@@ -1,5 +1,6 @@
 import React from "react";
 import { api } from "../lib/api.js";
+import { useConsent } from "../context/ConsentContext.jsx";
 
 const SESSION_KEY = "bp_session";
 
@@ -17,14 +18,19 @@ function getSessionId() {
   }
 }
 
-/** Registra a visita uma vez por carregamento. Falha em silencio de proposito. */
+/** Registra a visita apenas quando o usuario consentiu explicitamente com cookies analiticos (LGPD). */
 export function useTrackVisit(path) {
+  const { consent } = useConsent();
+
   React.useEffect(() => {
+    // Bloqueia rastreamento antes do consentimento ou se analytics for rejeitado
+    if (!consent?.analytics) return;
+
     const sessionId = getSessionId();
     if (!sessionId) return;
     api("/analytics/visita", {
       method: "POST",
       body: JSON.stringify({ sessionId, path, referrer: document.referrer || null })
     }).catch(() => {});
-  }, [path]);
+  }, [path, consent?.analytics]);
 }

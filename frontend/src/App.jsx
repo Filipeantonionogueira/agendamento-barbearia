@@ -16,6 +16,8 @@ const HistoryPage = React.lazy(() => import("./pages/HistoryPage.jsx").then((m) 
 const NotificationsPage = React.lazy(() => import("./pages/NotificationsPage.jsx").then((m) => ({ default: m.NotificationsPage })));
 const LoginPage = React.lazy(() => import("./pages/LoginPage.jsx").then((m) => ({ default: m.LoginPage })));
 const AdminPage = React.lazy(() => import("./pages/AdminPage.jsx").then((m) => ({ default: m.AdminPage })));
+const PrivacyPolicyPage = React.lazy(() => import("./pages/PrivacyPolicyPage.jsx").then((m) => ({ default: m.PrivacyPolicyPage })));
+const TermsPage = React.lazy(() => import("./pages/TermsPage.jsx").then((m) => ({ default: m.TermsPage })));
 
 function RequireAuth({ children }) {
   const { user, loading } = useAuth();
@@ -46,6 +48,8 @@ export function App() {
         <Route path="/conta/notificacoes" element={<RequireAuth><NotificationsPage /></RequireAuth>} />
         <Route path="/admin/login" element={<LoginPage />} />
         <Route path="/admin" element={<RequireStaff><AdminPage /></RequireStaff>} />
+        <Route path="/privacidade" element={<PrivacyPolicyPage />} />
+        <Route path="/termos" element={<TermsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </React.Suspense>

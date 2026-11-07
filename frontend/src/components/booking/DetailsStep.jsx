@@ -1,5 +1,6 @@
 import React from "react";
-import { UserRound } from "lucide-react";
+import { Link } from "react-router-dom";
+import { UserRound, ShieldCheck } from "lucide-react";
 import { StepSection } from "./StepSection.jsx";
 
 export function DetailsStep({ clientName, onClientNameChange, phone, onPhoneChange, notes, onNotesChange }) {
@@ -44,6 +45,20 @@ export function DetailsStep({ clientName, onClientNameChange, phone, onPhoneChan
           />
         </label>
       )}
+
+      <div className="mt-5 flex items-center gap-2 rounded-lg border border-border/80 bg-surface-subtle p-3 text-xs text-text-muted">
+        <ShieldCheck size={16} className="shrink-0 text-gold" />
+        <span>
+          Seus dados são protegidos conforme a LGPD. Ao prosseguir, você concorda com nossa{" "}
+          <Link to="/privacidade" target="_blank" className="font-medium text-text-primary underline hover:text-gold">
+            Política de Privacidade
+          </Link>{" "}
+          e{" "}
+          <Link to="/termos" target="_blank" className="font-medium text-text-primary underline hover:text-gold">
+            Termos de Uso
+          </Link>.
+        </span>
+      </div>
     </StepSection>
   );
 }

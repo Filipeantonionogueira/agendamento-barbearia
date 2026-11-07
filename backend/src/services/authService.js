@@ -21,7 +21,7 @@ const resetConfirmSchema = z.object({ token: z.string().min(10), password: z.str
 
 const loginSchema = z.object({
   email: z.string().trim().email(),
-  password: z.string().min(6)
+  password: z.string().min(6).max(72)
 });
 
 const registerSchema = z.object({
